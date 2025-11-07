@@ -1,0 +1,187 @@
+<div class="prediction-container">
+  <!-- Form Section -->
+  <div class="prediction-form card">
+    <h2>Disease Prediction</h2>
+    <p class="subtitle">Select your symptoms to get a disease prediction</p>
+
+    <!-- Error message -->
+    <div *ngIf="error" class="alert alert-error">
+      {{ error }}
+    </div>
+
+    <!-- Patient Information (Optional) -->
+    <div class="patient-info">
+      <div class="form-group">
+        <label class="form-label">Name (Optional)</label>
+        <input 
+          type="text" 
+          class="form-control" 
+          [(ngModel)]="patientName"
+          placeholder="Enter your name"
+        />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Age (Optional)</label>
+        <input 
+          type="number" 
+          class="form-control" 
+          [(ngModel)]="patientAge"
+          placeholder="Enter your age"
+          min="0"
+          max="120"
+        />
+      </div>
+    </div>
+
+    <!-- Symptoms Selection -->
+    <div class="symptoms-section">
+      <h3>Select Symptoms</h3>
+      
+      <!-- Search symptoms -->
+      <div class="form-group">
+        <input 
+          type="text" 
+          class="form-control search-input" 
+          [(ngModel)]="searchTerm"
+          placeholder="🔍 Search symptoms..."
+        />
+      </div>
+
+      <!-- Loading -->
+      <div *ngIf="symptomsLoading" class="text-center">
+        <div class="loading"></div>
+        <p>Loading symptoms...</p>
+      </div>
+
+      <!-- Symptoms list -->
+      <div *ngIf="!symptomsLoading" class="symptoms-grid">
+        <div 
+          *ngFor="let symptom of filteredSymptoms"
+          class="symptom-item"
+          [class.selected]="isSymptomSelected(symptom.name)"
+          (click)="toggleSymptom(symptom.name)"
+        >
+          <input 
+            type="checkbox" 
+            [checked]="isSymptomSelected(symptom.name)"
+            [id]="'symptom-' + symptom.id"
+            (click)="$event.stopPropagation()"
+          />
+          <label [for]="'symptom-' + symptom.id">
+            {{ symptom.name }}
+          </label>
+        </div>
+      </div>
+
+      <!-- Selected symptoms count -->
+      <div *ngIf="selectedSymptoms.size > 0" class="selected-count">
+        <strong>Selected: {{ selectedSymptoms.size }} symptom(s)</strong>
+      </div>
+    </div>
+
+    <!-- Action buttons -->
+    <div class="action-buttons">
+      <button 
+        class="btn btn-primary" 
+        (click)="submitPrediction()"
+        [disabled]="loading || selectedSymptoms.size === 0"
+      >
+        <span *ngIf="!loading">Predict Disease</span>
+        <span *ngIf="loading">
+          <span class="loading"></span> Predicting...
+        </span>
+      </button>
+      
+      <button 
+        class="btn btn-secondary" 
+        (click)="resetForm()"
+        [disabled]="loading"
+      >
+        Reset
+      </button>
+    </div>
+  </div>
+
+  <!-- Results Section -->
+  <div *ngIf="predictionResult" id="results" class="results-section">
+    <div class="result-card card">
+      <h2>Prediction Results</h2>
+      
+      <!-- Main prediction -->
+      <div class="main-prediction">
+        <div class="disease-name">
+          <h3>{{ predictionResult.predicted_disease }}</h3>
+          <span 
+            class="severity-badge"
+            [ngClass]="getSeverityClass(predictionResult.disease_info?.severity)"
+          >
+            {{ predictionResult.disease_info?.severity || 'Unknown' }} Severity
+          </span>
+        </div>
+        
+        <div class="confidence-section">
+          <div class="confidence-label">Confidence Score</div>
+          <div class="confidence-bar">
+            <div 
+              class="confidence-fill" 
+              [style.width.%]="getConfidencePercentage(predictionResult.confidence)"
+            ></div>
+          </div>
+          <div class="confidence-text">
+            {{ getConfidencePercentage(predictionResult.confidence) }}%
+          </div>
+        </div>
+      </div>
+
+      <!-- Disease Information -->
+      <div *ngIf="predictionResult.disease_info" class="disease-info">
+        <div *ngIf="predictionResult.disease_info.description" class="info-section">
+          <h4>📋 Description</h4>
+          <p>{{ predictionResult.disease_info.description }}</p>
+        </div>
+
+        <div *ngIf="predictionResult.disease_info.precautions && predictionResult.disease_info.precautions.length > 0" class="info-section">
+          <h4>⚠️ Precautions</h4>
+          <ul>
+            <li *ngFor="let precaution of predictionResult.disease_info.precautions">
+              {{ precaution }}
+            </li>
+          </ul>
+        </div>
+
+        <div *ngIf="predictionResult.disease_info.recommendations" class="info-section">
+          <h4>💡 Recommendations</h4>
+          <p>{{ predictionResult.disease_info.recommendations }}</p>
+        </div>
+      </div>
+
+      <!-- Alternative Predictions -->
+      <div *ngIf="predictionResult.alternatives && predictionResult.alternatives.length > 0" class="alternatives">
+        <h4>Other Possible Diseases</h4>
+        <div class="alternatives-list">
+          <div *ngFor="let alt of predictionResult.alternatives" class="alternative-item">
+            <span class="alt-name">{{ alt.disease }}</span>
+            <span class="alt-confidence">{{ getConfidencePercentage(alt.confidence) }}%</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Symptoms used -->
+      <div class="symptoms-used">
+        <h4>Symptoms Analyzed</h4>
+        <div class="symptoms-tags">
+          <span *ngFor="let symptom of predictionResult.symptoms_used" class="symptom-tag">
+            {{ symptom }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Disclaimer -->
+      <div class="disclaimer">
+        <p><strong>⚠️ Medical Disclaimer:</strong> This prediction is for educational purposes only and should not replace professional medical advice. Please consult a qualified healthcare provider for proper diagnosis and treatment.</p>
+      </div>
+    </div>
+  </div>
+</div>
+

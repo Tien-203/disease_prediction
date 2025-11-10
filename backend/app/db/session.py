@@ -4,10 +4,11 @@ from sqlalchemy.orm import sessionmaker, Session
 from app.core.config import settings
 
 # Create database engine
+# echo=False to disable SQL query logging
 engine = create_engine(
     settings.DATABASE_URL,
     pool_pre_ping=True,
-    echo=settings.DEBUG,
+    echo=False,  # Disable SQL query logging
 )
 
 # Create session factory

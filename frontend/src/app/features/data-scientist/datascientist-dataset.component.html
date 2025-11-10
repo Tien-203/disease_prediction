@@ -1,0 +1,25 @@
+<div class="ds-dataset">
+  <section class="ds-dataset__card">
+    <h1 class="ds-dataset__title">Dataset</h1>
+
+    <div class="ds-dataset__list">
+      <article class="ds-dataset__item" *ngFor="let record of records">
+        <div class="ds-dataset__column">
+          <span class="ds-dataset__label">Date Modified</span>
+          <span class="ds-dataset__value">{{ record.dateModified }}</span>
+        </div>
+        <div class="ds-dataset__column">
+          <span class="ds-dataset__label">Disease</span>
+          <span class="ds-dataset__value">{{ record.disease }}</span>
+        </div>
+        <div class="ds-dataset__column">
+          <span class="ds-dataset__label">Questions</span>
+          <ul class="ds-dataset__questions">
+            <li *ngFor="let question of record.questions">{{ question }}</li>
+          </ul>
+        </div>
+      </article>
+    </div>
+  </section>
+</div>
+

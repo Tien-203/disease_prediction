@@ -1,193 +1,236 @@
-import { Component } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { AuthService } from '../../core/services/auth.service';
+import { PredictionService } from '../prediction/services/prediction.service';
+import { Symptom } from '../prediction/models/symptom.model';
+import { PredictionResponse, DiseaseInfo } from '../prediction/models/prediction.model';
+import { finalize } from 'rxjs/operators';
 
-/**
- * Home Component
- */
+type QuickCheckStep = 1 | 2 | 3 | 4;
+
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [],
-  template: `
-    <div class="home-container">
-      <div class="hero">
-        <h1>🏥 Disease Prediction System</h1>
-        <p class="subtitle">Predict diseases based on symptoms using Machine Learning</p>
-        <button class="btn btn-primary btn-large" (click)="goToPrediction()">
-          Start Prediction
-        </button>
-      </div>
-
-      <div class="features">
-        <div class="feature-card">
-          <div class="feature-icon">🤖</div>
-          <h3>ML Powered</h3>
-          <p>Uses Random Forest algorithm for accurate predictions</p>
-        </div>
-
-        <div class="feature-card">
-          <div class="feature-icon">📊</div>
-          <h3>Confidence Scores</h3>
-          <p>Get prediction confidence levels and alternative diagnoses</p>
-        </div>
-
-        <div class="feature-card">
-          <div class="feature-icon">💊</div>
-          <h3>Disease Information</h3>
-          <p>Receive detailed information and precautions for each disease</p>
-        </div>
-      </div>
-
-      <div class="info-section">
-        <h2>How It Works</h2>
-        <div class="steps">
-          <div class="step">
-            <span class="step-number">1</span>
-            <h4>Select Symptoms</h4>
-            <p>Choose the symptoms you're experiencing from the list</p>
-          </div>
-          <div class="step">
-            <span class="step-number">2</span>
-            <h4>Get Prediction</h4>
-            <p>Our ML model analyzes your symptoms and predicts possible diseases</p>
-          </div>
-          <div class="step">
-            <span class="step-number">3</span>
-            <h4>View Results</h4>
-            <p>See prediction results with confidence scores and recommendations</p>
-          </div>
-        </div>
-      </div>
-
-      <div class="disclaimer">
-        <p><strong>⚠️ Disclaimer:</strong> This is an educational tool and should not be used as a substitute for professional medical advice. Always consult with a qualified healthcare provider for medical concerns.</p>
-      </div>
-    </div>
-  `,
-  styles: [`
-    .home-container {
-      padding: 40px 20px;
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-
-    .hero {
-      text-align: center;
-      padding: 60px 20px;
-      background: white;
-      border-radius: 12px;
-      margin-bottom: 40px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    }
-
-    .hero h1 {
-      font-size: 48px;
-      margin-bottom: 20px;
-      color: #333;
-    }
-
-    .subtitle {
-      font-size: 20px;
-      color: #666;
-      margin-bottom: 30px;
-    }
-
-    .btn-large {
-      padding: 16px 40px;
-      font-size: 18px;
-    }
-
-    .features {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 30px;
-      margin-bottom: 60px;
-    }
-
-    .feature-card {
-      background: white;
-      padding: 30px;
-      border-radius: 8px;
-      text-align: center;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-      transition: transform 0.3s;
-    }
-
-    .feature-card:hover {
-      transform: translateY(-5px);
-    }
-
-    .feature-icon {
-      font-size: 48px;
-      margin-bottom: 15px;
-    }
-
-    .feature-card h3 {
-      margin-bottom: 10px;
-      color: #4CAF50;
-    }
-
-    .info-section {
-      background: white;
-      padding: 40px;
-      border-radius: 8px;
-      margin-bottom: 30px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    }
-
-    .info-section h2 {
-      text-align: center;
-      margin-bottom: 40px;
-      color: #333;
-    }
-
-    .steps {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 30px;
-    }
-
-    .step {
-      text-align: center;
-    }
-
-    .step-number {
-      display: inline-block;
-      width: 50px;
-      height: 50px;
-      line-height: 50px;
-      background: #4CAF50;
-      color: white;
-      border-radius: 50%;
-      font-size: 24px;
-      font-weight: bold;
-      margin-bottom: 15px;
-    }
-
-    .step h4 {
-      margin-bottom: 10px;
-      color: #333;
-    }
-
-    .disclaimer {
-      background: #fff3cd;
-      border: 1px solid #ffc107;
-      padding: 20px;
-      border-radius: 8px;
-      text-align: center;
-    }
-
-    .disclaimer p {
-      margin: 0;
-      color: #856404;
-    }
-  `]
+  imports: [CommonModule, FormsModule],
+  templateUrl: './home.component.html',
+  styleUrls: ['./home.component.scss']
 })
-export class HomeComponent {
-  constructor(private router: Router) {}
+export class HomeComponent implements OnInit {
+  userName: string = 'Patient';
 
-  goToPrediction() {
-    this.router.navigate(['/prediction']);
+  quickCheckVisible = false;
+  quickCheckStep: QuickCheckStep = 1;
+  quickCheckError: string | null = null;
+
+  describeModalOpen = false;
+  describeText: string = '';
+  describeError: string | null = null;
+
+  symptomsLoading = false;
+  allSymptoms: Symptom[] = [];
+  selectedSymptoms: string[] = [];
+  symptomSearch: string = '';
+
+  questionAnswers: string[] = ['', '', '', ''];
+  readonly questionPrompts: string[] = [
+    'How long have you experienced these symptoms?',
+    'Do you have any existing medical conditions?',
+    'Are you currently taking any medication?',
+    'Have you noticed anything that improves or worsens the symptoms?'
+  ];
+
+  isPredicting = false;
+  predictionResult: PredictionResponse | null = null;
+
+  readonly stepLabels = ['1', '2', '3', '4'];
+
+  constructor(
+    private authService: AuthService,
+    private predictionService: PredictionService
+  ) {}
+
+  ngOnInit(): void {
+    console.log('HomeComponent initialized');
+    const currentUser = this.authService.getCurrentUser();
+    console.log('Current user in HomeComponent:', currentUser);
+    if (currentUser?.name) {
+      this.userName = currentUser.name;
+    } else if (currentUser?.email) {
+      this.userName = currentUser.email.split('@')[0];
+    }
+
+    this.loadSymptoms();
+  }
+
+  get filteredSymptoms(): Symptom[] {
+    const search = this.symptomSearch.trim().toLowerCase();
+    if (!search) {
+      return this.allSymptoms.slice(0, 6);
+    }
+
+    return this.allSymptoms
+      .filter((symptom) =>
+        symptom.name.toLowerCase().includes(search) ||
+        symptom.description?.toLowerCase().includes(search)
+      )
+      .slice(0, 8);
+  }
+
+  startQuickCheck(): void {
+    this.quickCheckVisible = true;
+    this.quickCheckStep = 1;
+    this.quickCheckError = null;
+    this.predictionResult = null;
+    this.questionAnswers = ['', '', '', ''];
+    this.selectedSymptoms = [];
+    this.symptomSearch = '';
+  }
+
+  closeQuickCheck(): void {
+    this.quickCheckVisible = false;
+    this.quickCheckError = null;
+    this.predictionResult = null;
+    this.isPredicting = false;
+    this.selectedSymptoms = [];
+    this.symptomSearch = '';
+  }
+
+  loadSymptoms(): void {
+    this.symptomsLoading = true;
+    this.predictionService.getSymptoms(0, 200).pipe(
+      finalize(() => this.symptomsLoading = false)
+    ).subscribe({
+      next: (response) => {
+        this.allSymptoms = response.symptoms;
+      },
+      error: () => {
+        this.quickCheckError = 'Unable to load symptom list right now. Please try again later.';
+      }
+    });
+  }
+
+  addSymptom(symptomName: string): void {
+    const trimmed = symptomName.trim();
+    if (!trimmed) {
+      return;
+    }
+
+    if (!this.selectedSymptoms.includes(trimmed)) {
+      this.selectedSymptoms = [...this.selectedSymptoms, trimmed];
+    }
+    this.symptomSearch = '';
+  }
+
+  removeSymptom(symptomName: string): void {
+    this.selectedSymptoms = this.selectedSymptoms.filter(item => item !== symptomName);
+  }
+
+  handleSymptomEnter(event: KeyboardEvent): void {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      this.addSymptom(this.symptomSearch);
+    }
+  }
+
+  goToQuestions(): void {
+    if (this.selectedSymptoms.length === 0) {
+      this.quickCheckError = 'Please add at least one symptom to continue.';
+      return;
+    }
+
+    this.quickCheckError = null;
+    this.quickCheckStep = 2;
+  }
+
+  submitQuickCheck(): void {
+    if (this.selectedSymptoms.length === 0) {
+      this.quickCheckError = 'Please make sure you selected at least one symptom.';
+      this.quickCheckStep = 1;
+      return;
+    }
+
+    this.runPrediction(this.selectedSymptoms);
+  }
+
+  runPrediction(symptoms: string[]): void {
+    this.isPredicting = true;
+    this.quickCheckError = null;
+    this.predictionResult = null;
+    this.quickCheckStep = 3;
+
+    this.predictionService.predictDisease({ symptoms }).pipe(
+      finalize(() => this.isPredicting = false)
+    ).subscribe({
+      next: (response) => {
+        this.predictionResult = response;
+        this.quickCheckStep = 4;
+      },
+      error: () => {
+        this.quickCheckError = 'We could not process your symptoms right now. Please try again.';
+        this.quickCheckStep = 1;
+      }
+    });
+  }
+
+  openDescribeModal(): void {
+    this.describeModalOpen = true;
+    this.describeError = null;
+    this.describeText = '';
+  }
+
+  closeDescribeModal(): void {
+    this.describeModalOpen = false;
+    this.describeError = null;
+    this.describeText = '';
+  }
+
+  submitFeelingDescription(): void {
+    const description = this.describeText.trim();
+    if (!description) {
+      this.describeError = 'Please describe how you feel before continuing.';
+      return;
+    }
+
+    const potentialSymptoms = description
+      .split(/,|;|\n/)
+      .map(part => part.trim())
+      .filter(Boolean);
+
+    if (potentialSymptoms.length === 0) {
+      this.describeError = 'Try separating symptoms with commas so we can understand them.';
+      return;
+    }
+
+    this.closeDescribeModal();
+    this.selectedSymptoms = potentialSymptoms;
+    this.quickCheckVisible = true;
+    this.runPrediction(this.selectedSymptoms);
+  }
+
+  getConfidencePercentage(confidence: number | undefined): number {
+    if (!confidence && confidence !== 0) {
+      return 0;
+    }
+    return Math.round(confidence * 100);
+  }
+
+  getRecommendationList(info?: DiseaseInfo): string[] {
+    if (!info) {
+      return [];
+    }
+
+    if (info.precautions && info.precautions.length > 0) {
+      return info.precautions;
+    }
+
+    if (info.recommendations) {
+      return info.recommendations
+        .split(/\.|\n|;/)
+        .map(item => item.trim())
+        .filter(Boolean);
+    }
+
+    return [];
   }
 }
-

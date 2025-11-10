@@ -1,0 +1,17 @@
+<div class="researcher-dashboard">
+  <section class="researcher-dashboard__hero">
+    <h1 class="researcher-dashboard__title">Welcome {{ displayName | titlecase }}</h1>
+    <p class="researcher-dashboard__subtitle">Choose what to do</p>
+
+    <div class="researcher-dashboard__actions">
+      <button type="button" class="res-button res-button--primary" (click)="exportDataset()">
+        Export Dataset
+      </button>
+      <span class="researcher-dashboard__separator">or</span>
+      <button type="button" class="res-button res-button--secondary" (click)="viewDataset()">
+        Show dataset
+      </button>
+    </div>
+  </section>
+</div>
+

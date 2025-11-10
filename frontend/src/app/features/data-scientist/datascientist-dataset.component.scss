@@ -1,0 +1,91 @@
+.ds-dataset {
+  min-height: calc(100vh - 160px);
+  background-color: #f5f9e9;
+  padding: 92px 64px;
+  display: flex;
+  justify-content: center;
+}
+
+.ds-dataset__card {
+  width: 100%;
+  max-width: 1020px;
+  padding: 68px 60px;
+  border-radius: 32px;
+  background-color: rgba(247, 251, 237, 0.95);
+  border: 1px solid rgba(16, 45, 36, 0.08);
+  box-shadow: 0 24px 48px rgba(16, 45, 36, 0.08);
+}
+
+.ds-dataset__title {
+  margin: 0 0 36px;
+  font-size: 40px;
+  color: #113226;
+  font-weight: 700;
+}
+
+.ds-dataset__list {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.ds-dataset__item {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  padding: 28px 30px;
+  border-radius: 26px;
+  background-color: #cce97b;
+  border: 1px solid rgba(16, 45, 36, 0.12);
+  box-shadow: 0 20px 40px rgba(16, 45, 36, 0.18);
+}
+
+.ds-dataset__column {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ds-dataset__label {
+  font-size: 16px;
+  color: #103124;
+  opacity: 0.7;
+  font-weight: 600;
+}
+
+.ds-dataset__value {
+  font-size: 18px;
+  color: #102d21;
+  font-weight: 600;
+}
+
+.ds-dataset__questions {
+  margin: 0;
+  padding-left: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  color: #143525;
+  font-size: 16px;
+}
+
+@media (max-width: 1024px) {
+  .ds-dataset__item {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 720px) {
+  .ds-dataset {
+    padding: 72px 20px;
+  }
+
+  .ds-dataset__card {
+    padding: 48px 30px;
+  }
+
+  .ds-dataset__item {
+    grid-template-columns: 1fr;
+  }
+}
+

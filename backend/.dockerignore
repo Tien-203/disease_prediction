@@ -1,0 +1,58 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+.eggs/
+dist/
+build/
+
+# Virtual environments
+venv/
+env/
+.venv/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+logs/
+*.log
+
+# Environment
+.env.local
+.env.*.local
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Git
+.git/
+.gitignore
+
+# Documentation
+*.md
+README.md
+
+# ML data (models should be mounted as volume)
+ml/data/
+ml/notebooks/
+
+# Alembic versions (keep alembic.ini and env.py)
+# alembic/versions/
+
+# Tests
+tests/
+*.pyc
+

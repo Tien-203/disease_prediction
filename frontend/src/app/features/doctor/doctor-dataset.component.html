@@ -1,0 +1,106 @@
+<div class="doctor-dataset">
+  <section class="doctor-dataset__card">
+    <h1 class="doctor-dataset__title">Dataset</h1>
+
+    <div class="doctor-dataset__filters">
+      <div class="doctor-dataset__search">
+        <span class="doctor-dataset__search-icon">🔍</span>
+        <input
+          type="text"
+          placeholder="Search for disease"
+          [(ngModel)]="searchTerm"
+        />
+      </div>
+
+      <div class="doctor-dataset__date-group">
+        <button
+          type="button"
+          class="doc-chip"
+          (click)="openDateModal('from')"
+        >
+          <span>From</span>
+          <strong>{{ fromDate }}</strong>
+        </button>
+        <button
+          type="button"
+          class="doc-chip"
+          (click)="openDateModal('to')"
+        >
+          <span>To</span>
+          <strong>{{ toDate }}</strong>
+        </button>
+      </div>
+
+      <button type="button" class="doctor-dataset__export" (click)="exportDataset()">
+        Export Dataset
+      </button>
+    </div>
+
+    <div class="doctor-dataset__list">
+      <article class="doctor-dataset__item" *ngFor="let record of filteredRecords">
+        <div class="doctor-dataset__column">
+          <span class="doctor-dataset__label">Date Modified</span>
+          <span class="doctor-dataset__value">{{ record.dateModified }}</span>
+        </div>
+        <div class="doctor-dataset__column">
+          <span class="doctor-dataset__label">Disease</span>
+          <span class="doctor-dataset__value">{{ record.disease }}</span>
+        </div>
+        <div class="doctor-dataset__column">
+          <span class="doctor-dataset__label">Questions</span>
+          <ul class="doctor-dataset__questions">
+            <li *ngFor="let question of record.questions">{{ question }}</li>
+          </ul>
+        </div>
+      </article>
+    </div>
+  </section>
+</div>
+
+<div class="doctor-modal-overlay" *ngIf="dateModalOpen">
+  <div class="doctor-modal">
+    <button type="button" class="doctor-modal__close" aria-label="Close date picker" (click)="closeDateModal()">
+      &times;
+    </button>
+
+    <div class="doctor-modal__chips">
+      <button
+        type="button"
+        class="doc-chip"
+        [class.doc-chip--active]="activeDatePicker === 'from'"
+        (click)="openDateModal('from')"
+      >
+        <span>From</span>
+        <strong>{{ fromDate }}</strong>
+      </button>
+      <button
+        type="button"
+        class="doc-chip"
+        [class.doc-chip--active]="activeDatePicker === 'to'"
+        (click)="openDateModal('to')"
+      >
+        <span>To</span>
+        <strong>{{ toDate }}</strong>
+      </button>
+    </div>
+
+    <div class="doctor-calendar">
+      <header class="doctor-calendar__header">
+        <span>October 2021</span>
+        <div class="doctor-calendar__nav">
+          <button type="button">‹</button>
+          <button type="button">›</button>
+        </div>
+      </header>
+      <div class="doctor-calendar__grid">
+        <span *ngFor="let day of ['M','T','W','T','F','S','S']" class="doctor-calendar__cell doctor-calendar__cell--muted">{{ day }}</span>
+        <button *ngFor="let date of [].constructor(31); let i = index" type="button"
+          class="doctor-calendar__cell"
+        >
+          {{ i + 1 }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+

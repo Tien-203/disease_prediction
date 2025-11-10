@@ -1,0 +1,17 @@
+<div class="doctor-dashboard">
+  <section class="doctor-dashboard__hero">
+    <h1 class="doctor-dashboard__title">Welcome {{ displayName | titlecase }}</h1>
+    <p class="doctor-dashboard__subtitle">Choose what to do</p>
+
+    <div class="doctor-dashboard__actions">
+      <button type="button" class="doc-button doc-button--primary" (click)="goToPatients()">
+        View Patient list
+      </button>
+      <span class="doctor-dashboard__separator">or</span>
+      <button type="button" class="doc-button doc-button--secondary" (click)="goToDataset()">
+        View dataset
+      </button>
+    </div>
+  </section>
+</div>
+

@@ -35,8 +35,8 @@ export class PredictionService {
   /**
    * Get prediction history
    */
-  getPredictionHistory(skip: number = 0, limit: number = 10): Observable<any> {
-    return this.apiService.get('/predict/history', { skip, limit });
+  getPredictionHistory(skip: number = 0, limit: number = 10): Observable<{ predictions: PredictionHistory[]; total: number }> {
+    return this.apiService.get<{ predictions: PredictionHistory[]; total: number }>('/predict/history', { skip, limit });
   }
 
   /**

@@ -1,185 +1,172 @@
 <div class="prediction-container">
+  <!-- Error message -->
+  <div *ngIf="error" class="alert alert-error">
+    {{ error }}
+  </div>
+
   <!-- Form Section -->
-  <div class="prediction-form card">
-    <h2>Disease Prediction</h2>
-    <p class="subtitle">Select your symptoms to get a disease prediction</p>
-
-    <!-- Error message -->
-    <div *ngIf="error" class="alert alert-error">
-      {{ error }}
-    </div>
-
-    <!-- Patient Information (Optional) -->
-    <div class="patient-info">
-      <div class="form-group">
-        <label class="form-label">Name (Optional)</label>
-        <input 
-          type="text" 
-          class="form-control" 
-          [(ngModel)]="patientName"
-          placeholder="Enter your name"
-        />
-      </div>
-
-      <div class="form-group">
-        <label class="form-label">Age (Optional)</label>
-        <input 
-          type="number" 
-          class="form-control" 
-          [(ngModel)]="patientAge"
-          placeholder="Enter your age"
-          min="0"
-          max="120"
-        />
-      </div>
-    </div>
-
-    <!-- Symptoms Selection -->
-    <div class="symptoms-section">
-      <h3>Select Symptoms</h3>
-      
-      <!-- Search symptoms -->
-      <div class="form-group">
-        <input 
-          type="text" 
-          class="form-control search-input" 
-          [(ngModel)]="searchTerm"
-          placeholder="🔍 Search symptoms..."
-        />
-      </div>
-
-      <!-- Loading -->
-      <div *ngIf="symptomsLoading" class="text-center">
-        <div class="loading"></div>
-        <p>Loading symptoms...</p>
-      </div>
-
-      <!-- Symptoms list -->
-      <div *ngIf="!symptomsLoading" class="symptoms-grid">
-        <div 
-          *ngFor="let symptom of filteredSymptoms"
-          class="symptom-item"
-          [class.selected]="isSymptomSelected(symptom.name)"
-          (click)="toggleSymptom(symptom.name)"
-        >
+  <div class="text-container">
+    <h1 class="heading">Disease Prediction</h1>
+    
+    <div class="prediction-form">
+      <div class="form-frame">
+        <p class="form-label">Name</p>
+        <div class="input-group">
           <input 
-            type="checkbox" 
-            [checked]="isSymptomSelected(symptom.name)"
-            [id]="'symptom-' + symptom.id"
-            (click)="$event.stopPropagation()"
+            type="text" 
+            class="form-control" 
+            [(ngModel)]="patientName"
+            placeholder="Enter your name"
           />
-          <label [for]="'symptom-' + symptom.id">
-            {{ symptom.name }}
-          </label>
+        </div>
+
+        <p class="form-label">Age</p>
+        <div class="input-group">
+          <input 
+            type="number" 
+            class="form-control" 
+            [(ngModel)]="patientAge"
+            placeholder="Enter your age"
+            min="0"
+            max="120"
+          />
+        </div>
+
+        <p class="form-label">Select Symptoms</p>
+        
+        <!-- Loading -->
+        <div *ngIf="symptomsLoading" class="text-center">
+          <div class="loading"></div>
+          <p>Loading symptoms...</p>
+        </div>
+
+        <!-- Symptoms checkboxes -->
+        <div *ngIf="!symptomsLoading" class="symptoms-checkboxes">
+          <div 
+            *ngFor="let symptom of filteredSymptoms"
+            class="checkbox-item"
+          >
+            <input 
+              type="checkbox" 
+              [checked]="isSymptomSelected(symptom.name)"
+              [id]="'symptom-' + symptom.id"
+              (change)="toggleSymptom(symptom.name)"
+            />
+            <label [for]="'symptom-' + symptom.id">
+              {{ symptom.name }}
+            </label>
+          </div>
+        </div>
+
+        <!-- Submit button -->
+        <div class="button-container">
+          <button 
+            class="btn btn-primary submit-button" 
+            (click)="submitPrediction()"
+            [disabled]="loading || selectedSymptoms.size === 0"
+          >
+            <span *ngIf="!loading">Submit</span>
+            <span *ngIf="loading">
+              <span class="loading"></span> Predicting...
+            </span>
+          </button>
         </div>
       </div>
-
-      <!-- Selected symptoms count -->
-      <div *ngIf="selectedSymptoms.size > 0" class="selected-count">
-        <strong>Selected: {{ selectedSymptoms.size }} symptom(s)</strong>
-      </div>
-    </div>
-
-    <!-- Action buttons -->
-    <div class="action-buttons">
-      <button 
-        class="btn btn-primary" 
-        (click)="submitPrediction()"
-        [disabled]="loading || selectedSymptoms.size === 0"
-      >
-        <span *ngIf="!loading">Predict Disease</span>
-        <span *ngIf="loading">
-          <span class="loading"></span> Predicting...
-        </span>
-      </button>
-      
-      <button 
-        class="btn btn-secondary" 
-        (click)="resetForm()"
-        [disabled]="loading"
-      >
-        Reset
-      </button>
     </div>
   </div>
 
   <!-- Results Section -->
   <div *ngIf="predictionResult" id="results" class="results-section">
-    <div class="result-card card">
-      <h2>Prediction Results</h2>
+    <div class="results-container">
+      <h1 class="heading">Prediction Results</h1>
       
-      <!-- Main prediction -->
-      <div class="main-prediction">
-        <div class="disease-name">
-          <h3>{{ predictionResult.predicted_disease }}</h3>
-          <span 
-            class="severity-badge"
-            [ngClass]="getSeverityClass(predictionResult.disease_info?.severity)"
-          >
-            {{ predictionResult.disease_info?.severity || 'Unknown' }} Severity
-          </span>
-        </div>
-        
-        <div class="confidence-section">
-          <div class="confidence-label">Confidence Score</div>
-          <div class="confidence-bar">
-            <div 
-              class="confidence-fill" 
-              [style.width.%]="getConfidencePercentage(predictionResult.confidence)"
-            ></div>
+      <!-- Results Table/Grid -->
+      <div class="results-grid">
+        <!-- Row 1: Disease Name, Confidence, Description -->
+        <div class="result-row">
+          <div class="table-cell">
+            <div class="cell-content">
+              <div class="cell-label">Disease Predicted</div>
+              <div class="cell-description">{{ predictionResult.predicted_disease }}</div>
+            </div>
           </div>
-          <div class="confidence-text">
-            {{ getConfidencePercentage(predictionResult.confidence) }}%
+          <div class="table-cell">
+            <div class="cell-content">
+              <div class="cell-label">Confidence Score</div>
+              <div class="cell-description">{{ getConfidencePercentage(predictionResult.confidence) }}%</div>
+            </div>
           </div>
-        </div>
-      </div>
-
-      <!-- Disease Information -->
-      <div *ngIf="predictionResult.disease_info" class="disease-info">
-        <div *ngIf="predictionResult.disease_info.description" class="info-section">
-          <h4>📋 Description</h4>
-          <p>{{ predictionResult.disease_info.description }}</p>
-        </div>
-
-        <div *ngIf="predictionResult.disease_info.precautions && predictionResult.disease_info.precautions.length > 0" class="info-section">
-          <h4>⚠️ Precautions</h4>
-          <ul>
-            <li *ngFor="let precaution of predictionResult.disease_info.precautions">
-              {{ precaution }}
-            </li>
-          </ul>
-        </div>
-
-        <div *ngIf="predictionResult.disease_info.recommendations" class="info-section">
-          <h4>💡 Recommendations</h4>
-          <p>{{ predictionResult.disease_info.recommendations }}</p>
-        </div>
-      </div>
-
-      <!-- Alternative Predictions -->
-      <div *ngIf="predictionResult.alternatives && predictionResult.alternatives.length > 0" class="alternatives">
-        <h4>Other Possible Diseases</h4>
-        <div class="alternatives-list">
-          <div *ngFor="let alt of predictionResult.alternatives" class="alternative-item">
-            <span class="alt-name">{{ alt.disease }}</span>
-            <span class="alt-confidence">{{ getConfidencePercentage(alt.confidence) }}%</span>
+          <div class="table-cell">
+            <div class="cell-content">
+              <div class="cell-label">Description</div>
+              <div class="cell-description">{{ predictionResult.disease_info?.description || 'No description available' }}</div>
+            </div>
           </div>
         </div>
-      </div>
 
-      <!-- Symptoms used -->
-      <div class="symptoms-used">
-        <h4>Symptoms Analyzed</h4>
-        <div class="symptoms-tags">
-          <span *ngFor="let symptom of predictionResult.symptoms_used" class="symptom-tag">
-            {{ symptom }}
-          </span>
+        <!-- Row 2: Severity, Symptoms, Precautions -->
+        <div class="result-row">
+          <div class="table-cell">
+            <div class="cell-content">
+              <div class="cell-label">Severity</div>
+              <div class="cell-description">{{ predictionResult.disease_info?.severity || 'Unknown' }}</div>
+            </div>
+          </div>
+          <div class="table-cell">
+            <div class="cell-content">
+              <div class="cell-label">Symptoms Analyzed</div>
+              <div class="cell-description">
+                <span *ngFor="let symptom of predictionResult.symptoms_used; let last = last">
+                  {{ symptom }}<span *ngIf="!last">, </span>
+                </span>
+              </div>
+            </div>
+          </div>
+          <div class="table-cell">
+            <div class="cell-content">
+              <div class="cell-label">Precautions</div>
+              <div class="cell-description">
+                <div *ngFor="let precaution of predictionResult.disease_info?.precautions">
+                  {{ precaution }}
+                </div>
+                <div *ngIf="!predictionResult.disease_info?.precautions || (predictionResult.disease_info?.precautions?.length ?? 0) === 0">
+                  No precautions available
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
 
-      <!-- Disclaimer -->
-      <div class="disclaimer">
-        <p><strong>⚠️ Medical Disclaimer:</strong> This prediction is for educational purposes only and should not replace professional medical advice. Please consult a qualified healthcare provider for proper diagnosis and treatment.</p>
+        <!-- Row 3: Recommendations, Alternatives -->
+        <div class="result-row">
+          <div class="table-cell">
+            <div class="cell-content">
+              <div class="cell-label">Recommendations</div>
+              <div class="cell-description">{{ predictionResult.disease_info?.recommendations || 'No recommendations available' }}</div>
+            </div>
+          </div>
+          <div class="table-cell">
+            <div class="cell-content">
+              <div class="cell-label">Alternative Predictions</div>
+              <div class="cell-description">
+                <div *ngFor="let alt of predictionResult.alternatives">
+                  {{ alt.disease }} ({{ getConfidencePercentage(alt.confidence) }}%)
+                </div>
+                <div *ngIf="!predictionResult.alternatives || (predictionResult.alternatives?.length ?? 0) === 0">
+                  No alternatives available
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="table-cell">
+            <div class="cell-content">
+              <div class="cell-label">Disclaimer</div>
+              <div class="cell-description disclaimer-text">
+                This prediction is for educational purposes only and should not replace professional medical advice.
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>

@@ -33,10 +33,19 @@ class Settings(BaseSettings):
     # Logging
     LOG_LEVEL: str = Field(default="INFO", description="Logging level")
     
+    # JWT Authentication
+    SECRET_KEY: str = Field(
+        default="your-secret-key-change-this-in-production-use-openssl-rand-hex-32",
+        description="Secret key for JWT token signing"
+    )
+    ALGORITHM: str = Field(default="HS256", description="JWT algorithm")
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = Field(default=30, description="Access token expiration in minutes")
+    
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",
-        case_sensitive=True
+        case_sensitive=True,
+        extra="ignore"  # Ignore extra fields in .env file
     )
 
 

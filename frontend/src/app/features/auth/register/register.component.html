@@ -1,0 +1,153 @@
+<div class="signup-page">
+  <div class="signup-page__card">
+    <h1 class="signup-page__title">Create your account</h1>
+    <p class="signup-page__subtitle">Join the Symptom-Based Prediction platform</p>
+
+    <div *ngIf="error" class="signup-page__error" role="alert">
+      {{ error }}
+    </div>
+
+    <form class="signup-form" (ngSubmit)="onSubmit()" novalidate>
+      <div class="signup-form__row">
+        <label class="signup-form__label" for="email">Email *</label>
+        <input
+          type="email"
+          id="email"
+          class="signup-form__control"
+          [(ngModel)]="email"
+          name="email"
+          placeholder="example@gmail.com"
+          required
+          [disabled]="loading"
+        />
+      </div>
+
+      <div class="signup-form__row">
+        <label class="signup-form__label" for="name">Full name</label>
+        <input
+          type="text"
+          id="name"
+          class="signup-form__control"
+          [(ngModel)]="name"
+          name="name"
+          placeholder="Enter your name (optional)"
+          [disabled]="loading"
+        />
+      </div>
+
+      <div class="signup-form__grid">
+        <div class="signup-form__row">
+          <label class="signup-form__label" for="age">Age</label>
+          <input
+            type="number"
+            id="age"
+            class="signup-form__control"
+            [(ngModel)]="age"
+            name="age"
+            placeholder="Age (optional)"
+            min="0"
+            max="150"
+            [disabled]="loading"
+          />
+        </div>
+
+        <div class="signup-form__row">
+          <label class="signup-form__label" for="gender">Gender</label>
+          <div class="select-wrapper">
+            <select
+              id="gender"
+              class="signup-form__control signup-form__control--select"
+              [(ngModel)]="gender"
+              name="gender"
+              [disabled]="loading"
+            >
+              <option value="">Select gender (optional)</option>
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+              <option value="other">Other</option>
+            </select>
+            <span class="select-icon" aria-hidden="true">▾</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="signup-form__row">
+        <label class="signup-form__label" for="role">Sign up as</label>
+        <div class="select-wrapper">
+          <select
+            id="role"
+            class="signup-form__control signup-form__control--select"
+            [(ngModel)]="selectedRole"
+            name="role"
+            required
+            [disabled]="loading"
+          >
+            <option *ngFor="let option of roles" [value]="option.value">
+              {{ option.label }}
+            </option>
+          </select>
+          <span class="select-icon" aria-hidden="true">▾</span>
+        </div>
+      </div>
+
+      <div class="signup-form__row">
+        <label class="signup-form__label" for="password">Password *</label>
+        <div class="password-field">
+          <input
+            [type]="showPassword ? 'text' : 'password'"
+            id="password"
+            class="signup-form__control"
+            [(ngModel)]="password"
+            name="password"
+            placeholder="Minimum 6 characters"
+            required
+            minlength="6"
+            [disabled]="loading"
+          />
+          <button
+            type="button"
+            class="password-field__toggle"
+            (click)="togglePasswordVisibility()"
+            [disabled]="loading"
+          >
+            {{ showPassword ? 'Hide' : 'Show' }}
+          </button>
+        </div>
+      </div>
+
+      <div class="signup-form__row">
+        <label class="signup-form__label" for="confirmPassword">Confirm password *</label>
+        <div class="password-field">
+          <input
+            [type]="showConfirmPassword ? 'text' : 'password'"
+            id="confirmPassword"
+            class="signup-form__control"
+            [(ngModel)]="confirmPassword"
+            name="confirmPassword"
+            placeholder="Re-enter your password"
+            required
+            [disabled]="loading"
+          />
+          <button
+            type="button"
+            class="password-field__toggle"
+            (click)="toggleConfirmPasswordVisibility()"
+            [disabled]="loading"
+          >
+            {{ showConfirmPassword ? 'Hide' : 'Show' }}
+          </button>
+        </div>
+      </div>
+
+      <button type="submit" class="signup-form__button" [disabled]="loading">
+        <span *ngIf="!loading">Create account</span>
+        <span *ngIf="loading">Creating account...</span>
+      </button>
+    </form>
+
+    <p class="signup-page__footer">
+      Already have an account?
+      <a routerLink="/login">Sign in</a>
+    </p>
+  </div>
+</div>

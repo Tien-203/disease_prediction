@@ -1,0 +1,62 @@
+// Design Tokens from Figma Design
+// These values should match exactly with the Figma design
+
+// Colors
+$figma-primary-green: #2e7d32; // Dark green for headers, buttons
+$figma-primary-green-light: #4caf50; // Medium green for hover states
+$figma-primary-green-dark: #1b5e20; // Darkest green for gradients
+$figma-accent-green: #8bc34a; // Light green for accents
+$figma-background-light: #f1f8e9; // Light green background
+$figma-background-white: #ffffff; // White for cards
+$figma-background-gray: #f5f5f5; // Light gray background
+$figma-text-primary: rgba(0, 0, 0, 0.87); // Primary text color
+$figma-text-secondary: rgba(0, 0, 0, 0.6); // Secondary text color
+$figma-text-white: #ffffff; // White text
+$figma-error-red: #f44336; // Error color
+
+// Typography
+$figma-font-family: 'Inter', 'Roboto', 'Helvetica Neue', sans-serif;
+$figma-font-weight-regular: 400;
+$figma-font-weight-medium: 500;
+$figma-font-weight-semibold: 550;
+$figma-font-weight-bold: 600;
+
+// Font Sizes (from Figma)
+$figma-font-size-11: 11px;
+$figma-font-size-12: 12px;
+$figma-font-size-14: 14px;
+$figma-font-size-16: 16px;
+$figma-font-size-20: 20px;
+$figma-font-size-24: 24px;
+$figma-font-size-32: 32px;
+
+// Line Heights
+$figma-line-height-16: 16px;
+$figma-line-height-20: 20px;
+$figma-line-height-24: 24px;
+$figma-line-height-28: 28px;
+$figma-line-height-32: 32px;
+$figma-line-height-48: 48px;
+
+// Spacing
+$figma-spacing-xs: 4px;
+$figma-spacing-sm: 8px;
+$figma-spacing-md: 16px;
+$figma-spacing-lg: 24px;
+$figma-spacing-xl: 32px;
+$figma-spacing-xxl: 48px;
+
+// Border Radius
+$figma-radius-sm: 4px;
+$figma-radius-md: 8px;
+$figma-radius-lg: 12px;
+
+// Shadows
+$figma-shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
+$figma-shadow-md: 0 4px 8px rgba(0, 0, 0, 0.15);
+$figma-shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.3);
+
+// Gradients
+$figma-gradient-primary: linear-gradient(135deg, #1b5e20 0%, #2e7d32 100%);
+
+

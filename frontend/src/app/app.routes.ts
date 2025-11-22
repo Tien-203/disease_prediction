@@ -1,119 +1,88 @@
 import { Routes } from '@angular/router';
-import { HomeComponent } from './features/home/home.component';
-import { LoginComponent } from './features/auth/login/login.component';
-import { RegisterComponent } from './features/auth/register/register.component';
-import { HistoryComponent } from './features/history/history.component';
-import { ProfileComponent } from './features/profile/profile.component';
-import { PredictionComponent } from './features/prediction/prediction.component';
-import { AboutComponent } from './features/about/about.component';
-import { DataScientistDashboardComponent } from './features/data-scientist/datascientist-dashboard.component';
-import { DataScientistProfileComponent } from './features/data-scientist/datascientist-profile.component';
-import { DataScientistDatasetComponent } from './features/data-scientist/datascientist-dataset.component';
-import { DoctorDashboardComponent } from './features/doctor/doctor-dashboard.component';
-import { DoctorProfileComponent } from './features/doctor/doctor-profile.component';
-import { DoctorDatasetComponent } from './features/doctor/doctor-dataset.component';
-import { DoctorPatientsComponent } from './features/doctor/doctor-patients.component';
-import { ResearcherDashboardComponent } from './features/researcher/researcher-dashboard.component';
-import { ResearcherProfileComponent } from './features/researcher/researcher-profile.component';
-import { ResearcherDatasetComponent } from './features/researcher/researcher-dataset.component';
+import { authGuard } from './core/guards/auth.guard';
+import { roleGuard } from './core/guards/role.guard';
+import { UserRole } from './core/models/user.model';
 
-/**
- * Application routes
- */
 export const routes: Routes = [
   {
     path: '',
-    pathMatch: 'full',
-    redirectTo: 'login'
+    loadComponent: () => import('./features/home/home.component').then(m => m.HomeComponent)
+  },
+  {
+    path: 'auth',
+    loadChildren: () => import('./features/auth/auth.routes').then(m => m.authRoutes)
   },
   {
     path: 'patient',
-    component: HomeComponent,
-    title: 'Patient Home - Disease Prediction'
-  },
-  {
-    path: 'researcher',
-    component: ResearcherDashboardComponent,
-    title: 'Researcher Home - Disease Prediction'
-  },
-  {
-    path: 'researcher/profile',
-    component: ResearcherProfileComponent,
-    title: 'Researcher Profile - Disease Prediction'
-  },
-  {
-    path: 'researcher/dataset',
-    component: ResearcherDatasetComponent,
-    title: 'Researcher Dataset - Disease Prediction'
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['patient'] },
+    children: [
+      {
+        path: 'predict',
+        loadComponent: () => import('./features/patient/prediction/prediction.component').then(m => m.PredictionComponent)
+      },
+      {
+        path: 'history',
+        loadComponent: () => import('./features/patient/history/history.component').then(m => m.HistoryComponent)
+      },
+      {
+        path: '',
+        redirectTo: 'predict',
+        pathMatch: 'full'
+      }
+    ]
   },
   {
     path: 'doctor',
-    component: DoctorDashboardComponent,
-    title: 'Doctor Home - Disease Prediction'
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['doctor'] },
+    children: [
+      {
+        path: 'dashboard',
+        loadComponent: () => import('./features/doctor/dashboard/dashboard.component').then(m => m.DoctorDashboardComponent)
+      },
+      {
+        path: '',
+        redirectTo: 'dashboard',
+        pathMatch: 'full'
+      }
+    ]
   },
   {
-    path: 'doctor/profile',
-    component: DoctorProfileComponent,
-    title: 'Doctor Profile - Disease Prediction'
+    path: 'data-scientist',
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['data_scientist'] },
+    children: [
+      {
+        path: 'dashboard',
+        loadComponent: () => import('./features/data-scientist/dashboard/dashboard.component').then(m => m.DataScientistDashboardComponent)
+      },
+      {
+        path: '',
+        redirectTo: 'dashboard',
+        pathMatch: 'full'
+      }
+    ]
   },
   {
-    path: 'doctor/dataset',
-    component: DoctorDatasetComponent,
-    title: 'Doctor Dataset - Disease Prediction'
-  },
-  {
-    path: 'doctor/patients',
-    component: DoctorPatientsComponent,
-    title: 'Patients - Disease Prediction'
-  },
-  {
-    path: 'ds',
-    component: DataScientistDashboardComponent,
-    title: 'Data Scientist Home - Disease Prediction'
-  },
-  {
-    path: 'ds/profile',
-    component: DataScientistProfileComponent,
-    title: 'Data Scientist Profile - Disease Prediction'
-  },
-  {
-    path: 'ds/dataset',
-    component: DataScientistDatasetComponent,
-    title: 'Dataset - Disease Prediction'
-  },
-  {
-    path: 'profile',
-    component: ProfileComponent,
-    title: 'Profile - Disease Prediction'
-  },
-  {
-    path: 'history',
-    component: HistoryComponent,
-    title: 'History - Disease Prediction'
-  },
-  {
-    path: 'login',
-    component: LoginComponent,
-    title: 'Login - Disease Prediction'
-  },
-  {
-    path: 'register',
-    component: RegisterComponent,
-    title: 'Register - Disease Prediction'
-  },
-  {
-    path: 'prediction',
-    component: PredictionComponent,
-    title: 'Prediction - Disease Prediction'
-  },
-  {
-    path: 'about',
-    component: AboutComponent,
-    title: 'About - Disease Prediction'
+    path: 'researcher',
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['researcher'] },
+    children: [
+      {
+        path: 'dashboard',
+        loadComponent: () => import('./features/researcher/dashboard/dashboard.component').then(m => m.ResearcherDashboardComponent)
+      },
+      {
+        path: '',
+        redirectTo: 'dashboard',
+        pathMatch: 'full'
+      }
+    ]
   },
   {
     path: '**',
-    redirectTo: 'login'
+    redirectTo: '',
+    pathMatch: 'full'
   }
 ];
-

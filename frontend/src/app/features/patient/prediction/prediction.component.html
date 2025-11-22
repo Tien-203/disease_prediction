@@ -1,0 +1,62 @@
+<div class="prediction-container">
+  <mat-card class="prediction-card">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>search</mat-icon>
+        Disease Prediction
+      </mat-card-title>
+      <mat-card-subtitle>Select your symptoms to predict possible diseases</mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <app-symptom-selector
+        [selectedSymptoms]="selectedSymptoms"
+        (symptomsChange)="onSymptomsChange($event)">
+      </app-symptom-selector>
+
+      @if (errorMessage) {
+        <div class="error-message">
+          <mat-icon>error</mat-icon>
+          <span>{{ errorMessage }}</span>
+        </div>
+      }
+
+      <div class="actions">
+        <button 
+          mat-raised-button 
+          color="primary" 
+          (click)="makePrediction()"
+          [disabled]="isLoading || selectedSymptoms.length === 0">
+          @if (isLoading) {
+            <ng-container>
+              <mat-icon class="spinning">refresh</mat-icon>
+              <span>Predicting...</span>
+            </ng-container>
+          } @else {
+            <ng-container>
+              <mat-icon>psychology</mat-icon>
+              <span>Predict Disease</span>
+            </ng-container>
+          }
+        </button>
+
+        @if (predictionResult) {
+          <button 
+            mat-button 
+            (click)="reset()">
+            <mat-icon>refresh</mat-icon>
+            <span>New Prediction</span>
+          </button>
+        }
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  @if (predictionResult) {
+    <app-prediction-result [prediction]="predictionResult"></app-prediction-result>
+  }
+
+  @if (diseaseInfo) {
+    <app-disease-card [disease]="diseaseInfo"></app-disease-card>
+  }
+</div>

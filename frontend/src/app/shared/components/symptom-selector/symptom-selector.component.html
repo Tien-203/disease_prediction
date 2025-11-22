@@ -1,0 +1,35 @@
+<div class="symptom-selector">
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>Search and Select Symptoms</mat-label>
+    <input 
+      matInput 
+      [formControl]="symptomControl"
+      [matAutocomplete]="auto"
+      placeholder="Type to search symptoms..."
+    >
+    <mat-icon matPrefix>search</mat-icon>
+    <mat-autocomplete #auto="matAutocomplete" (optionSelected)="onOptionSelected($event)">
+      @for (symptom of filteredSymptoms$ | async; track symptom.id) {
+        <mat-option [value]="symptom.name">
+          {{ symptom.name }}
+        </mat-option>
+      }
+    </mat-autocomplete>
+  </mat-form-field>
+
+  @if (selectedSymptomNames.length > 0) {
+    <div class="selected-symptoms">
+      <div class="chips-container">
+        @for (symptomName of selectedSymptomNames; track symptomName) {
+          <mat-chip>
+            {{ symptomName }}
+            <button matChipRemove (click)="removeSymptom(symptomName)" aria-label="Remove symptom">
+              <mat-icon>cancel</mat-icon>
+            </button>
+          </mat-chip>
+        }
+      </div>
+      <div class="count">{{ selectedSymptomNames.length }} symptom(s) selected</div>
+    </div>
+  }
+</div>

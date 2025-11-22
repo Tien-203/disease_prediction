@@ -1,207 +1,35 @@
-<div class="patient-home">
-  <section class="patient-home__welcome">
-    <div>
-      <h1 class="headline">Welcome {{ userName | titlecase }}</h1>
-      <p class="subtitle">How do you feel today?</p>
-    </div>
-
-    <div class="patient-home__actions">
-      <button type="button" class="cta cta--primary" (click)="startQuickCheck()">
-        Start a Quick Check by answer questions
-      </button>
-      <span class="patient-home__separator">or</span>
-      <button type="button" class="cta cta--secondary" (click)="openDescribeModal()">
-        Describe your symptoms
-      </button>
-    </div>
-  </section>
-</div>
-
-<div class="modal-overlay" *ngIf="quickCheckVisible">
-  <div class="modal">
-    <button class="modal__close" type="button" (click)="closeQuickCheck()" aria-label="Close quick check">
-      &times;
-    </button>
-
-    <div class="modal__progress">
-      <div
-        *ngFor="let label of stepLabels; index as idx"
-        class="progress-step"
-        [class.progress-step--active]="quickCheckStep === idx + 1"
-        [class.progress-step--done]="idx + 1 < quickCheckStep"
-      >
-        <span>{{ label }}</span>
-      </div>
-    </div>
-
-    <div class="modal__body">
-      <!-- Step 1 -->
-      <ng-container *ngIf="quickCheckStep === 1">
-        <h2 class="modal-title">What symptoms are you experiencing?</h2>
-        <p class="modal-caption">Search for your symptoms and add them to your check.</p>
-
-        <div class="symptom-search">
-          <div class="symptom-search__input">
-            <input
-              type="text"
-              placeholder="Search for your symptoms"
-              [(ngModel)]="symptomSearch"
-              (keydown)="handleSymptomEnter($event)"
-              [disabled]="symptomsLoading"
-            />
-            <button type="button" (click)="addSymptom(symptomSearch)" [disabled]="!symptomSearch.trim()">
-              Add
-            </button>
-          </div>
-
-          <div class="symptom-search__suggestions" *ngIf="filteredSymptoms.length > 0">
-            <button
-              type="button"
-              class="suggestion"
-              *ngFor="let symptom of filteredSymptoms"
-              (click)="addSymptom(symptom.name)"
-            >
-              {{ symptom.name }}
-            </button>
-          </div>
-        </div>
-
-        <div class="selected-symptoms" *ngIf="selectedSymptoms.length > 0">
-          <span class="selected-symptoms__label">Selected symptoms</span>
-          <div class="chip-group">
-            <span class="chip" *ngFor="let item of selectedSymptoms">
-              {{ item }}
-              <button type="button" class="chip__remove" (click)="removeSymptom(item)" aria-label="Remove symptom">
-                &times;
-              </button>
-            </span>
-          </div>
-        </div>
-
-        <div *ngIf="quickCheckError" class="modal-error" role="alert">
-          {{ quickCheckError }}
-        </div>
-
-        <div class="modal__footer">
-          <button type="button" class="cta cta--primary" (click)="goToQuestions()" [disabled]="selectedSymptoms.length === 0">
-            Continue
-          </button>
-        </div>
-      </ng-container>
-
-      <!-- Step 2 -->
-      <ng-container *ngIf="quickCheckStep === 2">
-        <h2 class="modal-title">Tell us a little more</h2>
-        <p class="modal-caption">Answer these quick questions to personalise your insights.</p>
-
-        <div class="question-list">
-          <label class="question" *ngFor="let question of questionPrompts; index as idx">
-            <span>{{ question }}</span>
-            <input
-              type="text"
-              placeholder="Question answer"
-              [(ngModel)]="questionAnswers[idx]"
-            />
-          </label>
-        </div>
-
-        <div class="modal__footer">
-          <button type="button" class="cta cta--secondary" (click)="quickCheckStep = 1">
-            Back
-          </button>
-          <button type="button" class="cta cta--primary" (click)="submitQuickCheck()">
-            Continue
-          </button>
-        </div>
-      </ng-container>
-
-      <!-- Step 3 -->
-      <ng-container *ngIf="quickCheckStep === 3">
-        <div class="checking">
-          <div class="checking__indicator">
-            <div class="ring"></div>
-            <div class="ring ring--inner"></div>
-          </div>
-          <p>Checking your symptoms</p>
-        </div>
-      </ng-container>
-
-      <!-- Step 4 -->
-      <ng-container *ngIf="quickCheckStep === 4">
-        <h2 class="modal-title">Here are your possible conditions</h2>
-
-        <div class="prediction-results" *ngIf="predictionResult; else noResult">
-          <div class="prediction-results__item">
-            <span class="prediction-results__disease">{{ predictionResult.predicted_disease }}</span>
-            <span class="prediction-results__confidence">
-              {{ getConfidencePercentage(predictionResult.confidence) }}%
-            </span>
-          </div>
-
-          <div class="prediction-results__item" *ngFor="let alt of predictionResult.alternatives">
-            <span class="prediction-results__disease">{{ alt.disease }}</span>
-            <span class="prediction-results__confidence">
-              {{ getConfidencePercentage(alt.confidence) }}%
-            </span>
-          </div>
-        </div>
-
-        <ng-template #noResult>
-          <div class="modal-error">
-            We could not determine a condition. Please try again later.
-          </div>
-        </ng-template>
-
-        <div class="recommendations" *ngIf="predictionResult as result">
-          <h3>Our Recommendations</h3>
-          <ng-container *ngIf="getRecommendationList(result.disease_info) as recommendationList">
-            <ul>
-              <li *ngFor="let tip of recommendationList">
-                {{ tip }}
-              </li>
-              <li *ngIf="recommendationList.length === 0">
-                Stay hydrated, rest well, and consult a doctor if symptoms persist.
-              </li>
-            </ul>
-          </ng-container>
-        </div>
-
-        <div class="modal__footer modal__footer--center">
-          <button type="button" class="cta cta--primary" (click)="closeQuickCheck()">
-            Close
-          </button>
-        </div>
-      </ng-container>
-    </div>
-  </div>
-</div>
-
-<div class="modal-overlay" *ngIf="describeModalOpen">
-  <div class="modal modal--compact">
-    <button class="modal__close" type="button" (click)="closeDescribeModal()" aria-label="Close description modal">
-      &times;
-    </button>
-
-    <div class="modal__body">
-      <h2 class="modal-title">How are you feeling right now?</h2>
-      <p class="modal-caption">Describe your feeling. Separate multiple symptoms with commas.</p>
-
-      <textarea
-        rows="6"
-        placeholder="Describe your feeling"
-        [(ngModel)]="describeText"
-      ></textarea>
-
-      <div *ngIf="describeError" class="modal-error" role="alert">
-        {{ describeError }}
-      </div>
-
-      <div class="modal__footer modal__footer--end">
-        <button type="button" class="cta cta--primary" (click)="submitFeelingDescription()">
-          Continue
+<div class="home-container">
+  <section class="hero">
+    <div class="hero-content">
+      <h1>Disease Prediction System</h1>
+      <p class="subtitle">AI-powered disease prediction based on symptoms</p>
+      <div class="hero-actions">
+        <button mat-raised-button color="primary" routerLink="/auth/register" size="large">
+          <mat-icon>person_add</mat-icon>
+          Get Started
+        </button>
+        <button mat-button routerLink="/auth/login" size="large">
+          <mat-icon>login</mat-icon>
+          Login
         </button>
       </div>
     </div>
-  </div>
-</div>
+  </section>
 
+  <section class="features">
+    <h2>Features</h2>
+    <div class="features-grid">
+      @for (feature of features; track feature.title) {
+        <mat-card class="feature-card">
+          <mat-card-header>
+            <mat-icon class="feature-icon">{{ feature.icon }}</mat-icon>
+            <mat-card-title>{{ feature.title }}</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <p>{{ feature.description }}</p>
+          </mat-card-content>
+        </mat-card>
+      }
+    </div>
+  </section>
+</div>

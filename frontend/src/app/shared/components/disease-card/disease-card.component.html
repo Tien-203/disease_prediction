@@ -1,0 +1,41 @@
+@if (disease) {
+  <mat-card class="disease-card">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>local_hospital</mat-icon>
+        {{ disease.name }}
+      </mat-card-title>
+      @if (disease.severity) {
+        <mat-card-subtitle>
+          <mat-chip [color]="getSeverityColor(disease.severity)">
+            {{ disease.severity | titlecase }}
+          </mat-chip>
+        </mat-card-subtitle>
+      }
+    </mat-card-header>
+
+    <mat-card-content>
+      @if (disease.description) {
+        <p class="description">{{ disease.description }}</p>
+      }
+
+      @if (disease.precautions && disease.precautions.length > 0) {
+        <div class="precautions">
+          <h4>Precautions:</h4>
+          <ul>
+            @for (precaution of disease.precautions; track precaution) {
+              <li>{{ precaution }}</li>
+            }
+          </ul>
+        </div>
+      }
+
+      @if (disease.recommendations) {
+        <div class="recommendations">
+          <h4>Recommendations:</h4>
+          <p>{{ disease.recommendations }}</p>
+        </div>
+      }
+    </mat-card-content>
+  </mat-card>
+}

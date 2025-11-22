@@ -1,153 +1,117 @@
-<div class="signup-page">
-  <div class="signup-page__card">
-    <h1 class="signup-page__title">Create your account</h1>
-    <p class="signup-page__subtitle">Join the Symptom-Based Prediction platform</p>
+<div class="register-container">
+  <mat-card class="register-card">
+    <mat-card-header>
+      <mat-card-title>Register</mat-card-title>
+      <mat-card-subtitle>Create a new account</mat-card-subtitle>
+    </mat-card-header>
 
-    <div *ngIf="error" class="signup-page__error" role="alert">
-      {{ error }}
-    </div>
+    <mat-card-content>
+      <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Email</mat-label>
+          <input matInput type="email" formControlName="email" required>
+          <mat-icon matPrefix>email</mat-icon>
+          @if (registerForm.get('email')?.hasError('required') && registerForm.get('email')?.touched) {
+            <mat-error>Email is required</mat-error>
+          }
+          @if (registerForm.get('email')?.hasError('email') && registerForm.get('email')?.touched) {
+            <mat-error>Invalid email format</mat-error>
+          }
+        </mat-form-field>
 
-    <form class="signup-form" (ngSubmit)="onSubmit()" novalidate>
-      <div class="signup-form__row">
-        <label class="signup-form__label" for="email">Email *</label>
-        <input
-          type="email"
-          id="email"
-          class="signup-form__control"
-          [(ngModel)]="email"
-          name="email"
-          placeholder="example@gmail.com"
-          required
-          [disabled]="loading"
-        />
-      </div>
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Password</mat-label>
+          <input matInput [type]="hidePassword ? 'password' : 'text'" formControlName="password" required>
+          <mat-icon matPrefix>lock</mat-icon>
+          <button mat-icon-button matSuffix (click)="hidePassword = !hidePassword" type="button">
+            <mat-icon>{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+          </button>
+          @if (registerForm.get('password')?.hasError('required') && registerForm.get('password')?.touched) {
+            <mat-error>Password is required</mat-error>
+          }
+          @if (registerForm.get('password')?.hasError('minlength') && registerForm.get('password')?.touched) {
+            <mat-error>Password must be at least 6 characters</mat-error>
+          }
+        </mat-form-field>
 
-      <div class="signup-form__row">
-        <label class="signup-form__label" for="name">Full name</label>
-        <input
-          type="text"
-          id="name"
-          class="signup-form__control"
-          [(ngModel)]="name"
-          name="name"
-          placeholder="Enter your name (optional)"
-          [disabled]="loading"
-        />
-      </div>
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Confirm Password</mat-label>
+          <input matInput [type]="hidePassword ? 'password' : 'text'" formControlName="confirmPassword" required>
+          <mat-icon matPrefix>lock</mat-icon>
+          @if (registerForm.get('confirmPassword')?.hasError('required') && registerForm.get('confirmPassword')?.touched) {
+            <mat-error>Please confirm your password</mat-error>
+          }
+          @if (registerForm.hasError('passwordMismatch') && registerForm.get('confirmPassword')?.touched) {
+            <mat-error>Passwords do not match</mat-error>
+          }
+        </mat-form-field>
 
-      <div class="signup-form__grid">
-        <div class="signup-form__row">
-          <label class="signup-form__label" for="age">Age</label>
-          <input
-            type="number"
-            id="age"
-            class="signup-form__control"
-            [(ngModel)]="age"
-            name="age"
-            placeholder="Age (optional)"
-            min="0"
-            max="150"
-            [disabled]="loading"
-          />
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Name (Optional)</mat-label>
+          <input matInput formControlName="name">
+          <mat-icon matPrefix>person</mat-icon>
+        </mat-form-field>
+
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="half-width">
+            <mat-label>Age (Optional)</mat-label>
+            <input matInput type="number" formControlName="age" min="0" max="150">
+            <mat-icon matPrefix>calendar_today</mat-icon>
+            @if (registerForm.get('age')?.hasError('min') || registerForm.get('age')?.hasError('max')) {
+              <mat-error>Age must be between 0 and 150</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="half-width">
+            <mat-label>Gender (Optional)</mat-label>
+            <mat-select formControlName="gender">
+              <mat-option value="">Select</mat-option>
+              <mat-option value="male">Male</mat-option>
+              <mat-option value="female">Female</mat-option>
+              <mat-option value="other">Other</mat-option>
+            </mat-select>
+            <mat-icon matPrefix>wc</mat-icon>
+          </mat-form-field>
         </div>
 
-        <div class="signup-form__row">
-          <label class="signup-form__label" for="gender">Gender</label>
-          <div class="select-wrapper">
-            <select
-              id="gender"
-              class="signup-form__control signup-form__control--select"
-              [(ngModel)]="gender"
-              name="gender"
-              [disabled]="loading"
-            >
-              <option value="">Select gender (optional)</option>
-              <option value="male">Male</option>
-              <option value="female">Female</option>
-              <option value="other">Other</option>
-            </select>
-            <span class="select-icon" aria-hidden="true">▾</span>
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Role</mat-label>
+          <mat-select formControlName="role" required>
+            @for (role of roles; track role) {
+              <mat-option [value]="role">{{ role | titlecase }}</mat-option>
+            }
+          </mat-select>
+          <mat-icon matPrefix>badge</mat-icon>
+          @if (registerForm.get('role')?.hasError('required') && registerForm.get('role')?.touched) {
+            <mat-error>Role is required</mat-error>
+          }
+        </mat-form-field>
+
+        @if (errorMessage) {
+          <div class="error-message">
+            <mat-icon>error</mat-icon>
+            <span>{{ errorMessage }}</span>
           </div>
-        </div>
+        }
+
+        <button mat-raised-button color="primary" type="submit" class="full-width" [disabled]="isLoading || registerForm.invalid">
+          @if (isLoading) {
+            <ng-container>
+              <mat-icon class="spinning">refresh</mat-icon>
+              <span>Registering...</span>
+            </ng-container>
+          } @else {
+            <span>Register</span>
+          }
+        </button>
+      </form>
+    </mat-card-content>
+
+    <mat-card-footer>
+      <div class="footer-links">
+        <span>Already have an account?</span>
+        <a (click)="navigateToLogin()" class="link">Login here</a>
       </div>
-
-      <div class="signup-form__row">
-        <label class="signup-form__label" for="role">Sign up as</label>
-        <div class="select-wrapper">
-          <select
-            id="role"
-            class="signup-form__control signup-form__control--select"
-            [(ngModel)]="selectedRole"
-            name="role"
-            required
-            [disabled]="loading"
-          >
-            <option *ngFor="let option of roles" [value]="option.value">
-              {{ option.label }}
-            </option>
-          </select>
-          <span class="select-icon" aria-hidden="true">▾</span>
-        </div>
-      </div>
-
-      <div class="signup-form__row">
-        <label class="signup-form__label" for="password">Password *</label>
-        <div class="password-field">
-          <input
-            [type]="showPassword ? 'text' : 'password'"
-            id="password"
-            class="signup-form__control"
-            [(ngModel)]="password"
-            name="password"
-            placeholder="Minimum 6 characters"
-            required
-            minlength="6"
-            [disabled]="loading"
-          />
-          <button
-            type="button"
-            class="password-field__toggle"
-            (click)="togglePasswordVisibility()"
-            [disabled]="loading"
-          >
-            {{ showPassword ? 'Hide' : 'Show' }}
-          </button>
-        </div>
-      </div>
-
-      <div class="signup-form__row">
-        <label class="signup-form__label" for="confirmPassword">Confirm password *</label>
-        <div class="password-field">
-          <input
-            [type]="showConfirmPassword ? 'text' : 'password'"
-            id="confirmPassword"
-            class="signup-form__control"
-            [(ngModel)]="confirmPassword"
-            name="confirmPassword"
-            placeholder="Re-enter your password"
-            required
-            [disabled]="loading"
-          />
-          <button
-            type="button"
-            class="password-field__toggle"
-            (click)="toggleConfirmPasswordVisibility()"
-            [disabled]="loading"
-          >
-            {{ showConfirmPassword ? 'Hide' : 'Show' }}
-          </button>
-        </div>
-      </div>
-
-      <button type="submit" class="signup-form__button" [disabled]="loading">
-        <span *ngIf="!loading">Create account</span>
-        <span *ngIf="loading">Creating account...</span>
-      </button>
-    </form>
-
-    <p class="signup-page__footer">
-      Already have an account?
-      <a routerLink="/login">Sign in</a>
-    </p>
-  </div>
+    </mat-card-footer>
+  </mat-card>
 </div>

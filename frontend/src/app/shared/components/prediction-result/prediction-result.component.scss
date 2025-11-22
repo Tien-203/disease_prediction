@@ -1,0 +1,50 @@
+.prediction-result-card {
+  margin-bottom: 24px;
+}
+
+.confidence-bar {
+  margin: 16px 0;
+}
+
+.symptoms-used,
+.alternatives {
+  margin-top: 24px;
+}
+
+.symptoms-used h4,
+.alternatives h4 {
+  margin-bottom: 12px;
+  font-weight: 500;
+}
+
+.chips-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.alternatives-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.alternative-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background-color: rgba(0, 0, 0, 0.02);
+  border-radius: 4px;
+}
+
+.disease-name {
+  font-weight: 500;
+}
+
+.confidence {
+  color: rgba(0, 0, 0, 0.6);
+  font-size: 0.875rem;
+}
+
+

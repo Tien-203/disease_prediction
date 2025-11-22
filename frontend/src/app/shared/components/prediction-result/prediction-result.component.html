@@ -1,0 +1,46 @@
+@if (prediction) {
+  <mat-card class="prediction-result-card">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>psychology</mat-icon>
+        Predicted Disease: {{ prediction.predicted_disease }}
+      </mat-card-title>
+      <mat-card-subtitle>
+        Confidence: {{ prediction.confidence | confidence }}
+      </mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <div class="confidence-bar">
+        <mat-progress-bar 
+          mode="determinate" 
+          [value]="prediction.confidence * 100"
+          [color]="getConfidenceColor(prediction.confidence)">
+        </mat-progress-bar>
+      </div>
+
+      <div class="symptoms-used">
+        <h4>Symptoms Used:</h4>
+        <div class="chips-container">
+          @for (symptom of prediction.symptoms_used; track symptom) {
+            <mat-chip>{{ symptom }}</mat-chip>
+          }
+        </div>
+      </div>
+
+      @if (prediction.alternatives && prediction.alternatives.length > 0) {
+        <div class="alternatives">
+          <h4>Alternative Predictions:</h4>
+          <div class="alternatives-list">
+            @for (alt of prediction.alternatives; track alt.disease) {
+              <div class="alternative-item">
+                <span class="disease-name">{{ alt.disease }}</span>
+                <span class="confidence">{{ alt.confidence | confidence }}</span>
+              </div>
+            }
+          </div>
+        </div>
+      }
+    </mat-card-content>
+  </mat-card>
+}

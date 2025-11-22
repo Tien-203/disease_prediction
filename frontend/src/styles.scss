@@ -1,161 +1,257 @@
-// Import design tokens
-@import './styles/_design-tokens';
+/* Custom Theming for Angular Material */
+@use '@angular/material' as mat;
+@include mat.core();
+
+// Define custom green color palette based on Figma design
+// Dark green/black for inputs and buttons
+$custom-primary: mat.define-palette((
+  50: #e8f5e9,
+  100: #c8e6c9,
+  200: #a5d6a7,
+  300: #81c784,
+  400: #66bb6a,
+  500: #4caf50, // Main green
+  600: #43a047,
+  700: #388e3c,
+  800: #2e7d32,
+  900: #1b5e20,
+  A100: #b9f6ca,
+  A200: #69f0ae,
+  A400: #00e676,
+  A700: #00c853,
+  contrast: (
+    50: rgba(black, 0.87),
+    100: rgba(black, 0.87),
+    200: rgba(black, 0.87),
+    300: rgba(black, 0.87),
+    400: rgba(black, 0.87),
+    500: white,
+    600: white,
+    700: white,
+    800: white,
+    900: white,
+    A100: rgba(black, 0.87),
+    A200: rgba(black, 0.87),
+    A400: white,
+    A700: white,
+  )
+));
+
+// Dark green/black for dark theme elements
+$custom-accent: mat.define-palette((
+  50: #f1f8e9,
+  100: #dcedc8,
+  200: #c5e1a5,
+  300: #aed581,
+  400: #9ccc65,
+  500: #8bc34a,
+  600: #7cb342,
+  700: #689f38,
+  800: #558b2f,
+  900: #33691e,
+  A100: #ccff90,
+  A200: #b2ff59,
+  A400: #76ff03,
+  A700: #64dd17,
+  contrast: (
+    50: rgba(black, 0.87),
+    100: rgba(black, 0.87),
+    200: rgba(black, 0.87),
+    300: rgba(black, 0.87),
+    400: rgba(black, 0.87),
+    500: rgba(black, 0.87),
+    600: white,
+    700: white,
+    800: white,
+    900: white,
+    A100: rgba(black, 0.87),
+    A200: rgba(black, 0.87),
+    A400: rgba(black, 0.87),
+    A700: white,
+  )
+));
+
+// Warn palette (red for errors)
+$custom-warn: mat.define-palette(mat.$red-palette);
+
+// Create light theme
+$custom-theme: mat.define-light-theme((
+  color: (
+    primary: $custom-primary,
+    accent: $custom-accent,
+    warn: $custom-warn,
+  ),
+  typography: mat.define-typography-config(
+    $font-family: '"Inter", "Roboto", "Helvetica Neue", sans-serif',
+    $headline-1: mat.define-typography-level(32px, 48px, 600, 'Inter'),
+    $headline-2: mat.define-typography-level(24px, 32px, 500, 'Inter'),
+    $headline-3: mat.define-typography-level(20px, 28px, 500, 'Inter'),
+    $headline-4: mat.define-typography-level(16px, 24px, 500, 'Inter'),
+    $subtitle-1: mat.define-typography-level(16px, 24px, 500, 'Inter'),
+    $subtitle-2: mat.define-typography-level(14px, 20px, 500, 'Inter'),
+    $body-1: mat.define-typography-level(16px, 24px, 400, 'Inter'),
+    $body-2: mat.define-typography-level(14px, 20px, 400, 'Inter'),
+    $caption: mat.define-typography-level(12px, 16px, 400, 'Inter'),
+    $button: mat.define-typography-level(14px, 36px, 500, 'Inter'),
+  ),
+  density: 0
+));
+
+// Include theme styles
+@include mat.all-component-themes($custom-theme);
 
 /* Global Styles */
-* {
+html, body {
+  height: 100%;
   margin: 0;
   padding: 0;
-  box-sizing: border-box;
 }
 
 body {
-  font-family: $font-family;
-  background-color: $background;
-  color: $text-primary;
-  line-height: $line-height-base;
-  font-size: $font-size-base;
+  font-family: 'Inter', 'Roboto', 'Helvetica Neue', sans-serif;
+  font-weight: 400;
+  background-color: #f5f5f5;
+  color: rgba(0, 0, 0, 0.87);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-.container {
-  max-width: $container-max-width;
-  margin: 0 auto;
-  padding: $container-padding;
+* {
+  box-sizing: border-box;
 }
 
-// Button Styles
-.btn {
-  padding: $button-padding;
-  border: none;
-  border-radius: $button-border-radius;
-  cursor: pointer;
-  font-size: $font-size-base;
-  transition: all 0.3s;
-  font-weight: $font-weight-medium;
-  height: $button-height;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
+/* Custom Material Overrides for Figma Design */
 
-.btn-primary {
-  background-color: $primary-color;
+// Dark themed forms (login/register)
+.dark-form {
+  background: linear-gradient(135deg, #1b5e20 0%, #2e7d32 100%);
   color: white;
   
-  &:hover {
-    background-color: $primary-hover;
+  .mat-mdc-form-field {
+    .mat-mdc-text-field-wrapper {
+      background-color: rgba(255, 255, 255, 0.1);
+      
+      .mat-mdc-form-field-flex {
+        .mat-mdc-form-field-input-control {
+          input, textarea {
+            color: white;
+            
+            &::placeholder {
+              color: rgba(255, 255, 255, 0.7);
+            }
+          }
+        }
+      }
+    }
+    
+    .mat-mdc-form-field-label {
+      color: rgba(255, 255, 255, 0.9);
+    }
+    
+    .mat-mdc-form-field-underline::before {
+      background-color: rgba(255, 255, 255, 0.5);
+    }
+    
+    &.mat-focused {
+      .mat-mdc-form-field-label {
+        color: #8bc34a;
+      }
+      
+      .mat-mdc-form-field-underline::after {
+        background-color: #8bc34a;
+      }
+    }
+  }
+  
+  .mat-mdc-button, .mat-mdc-raised-button {
+    background-color: #4caf50;
+    color: white;
+    
+    &:hover {
+      background-color: #66bb6a;
+    }
+    
+    &:disabled {
+      background-color: rgba(255, 255, 255, 0.3);
+      color: rgba(255, 255, 255, 0.5);
+    }
   }
 }
 
-.btn-secondary {
-  background-color: $secondary-color;
+// Light green/white theme for main content
+.light-content {
+  background-color: #f1f8e9;
+  
+  .mat-mdc-card {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .mat-mdc-table {
+    background-color: white;
+    
+    .mat-mdc-header-row {
+      background-color: #e8f5e9;
+    }
+    
+    .mat-mdc-row:hover {
+      background-color: #f1f8e9;
+    }
+  }
+}
+
+// Custom button styles
+.mat-mdc-raised-button.mat-primary {
+  background-color: #2e7d32;
   color: white;
+  font-weight: 500;
   
   &:hover {
-    background-color: $secondary-hover;
+    background-color: #388e3c;
   }
 }
 
-.btn-large {
-  height: $button-large-height;
-  padding: $button-large-padding;
-  font-size: $font-size-large;
-}
-
-.btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-// Card Styles
-.card {
-  background: $background-white;
-  border-radius: $card-border-radius;
-  padding: $card-padding;
-  box-shadow: $card-shadow;
-  margin-bottom: $spacing-lg;
-}
-
-// Form Styles
-.form-group {
-  margin-bottom: $spacing-lg;
-}
-
-.form-label {
-  display: block;
-  margin-bottom: $spacing-xs;
-  font-weight: $font-weight-medium;
-  color: $text-light;
-  font-size: $font-size-small;
-}
-
-.form-control {
-  width: 100%;
-  padding: $input-padding;
-  border: $input-border;
-  border-radius: $input-border-radius;
-  font-size: $font-size-small;
-  height: $input-height;
-  font-family: $font-family;
+.mat-mdc-button.mat-primary {
+  color: #2e7d32;
   
-  &:focus {
-    outline: none;
-    border-color: $primary-color;
+  &:hover {
+    background-color: rgba(46, 125, 50, 0.1);
+  }
+}
+
+// Custom input field styles
+.mat-mdc-form-field {
+  .mat-mdc-text-field-wrapper {
+    background-color: white;
   }
   
-  &::placeholder {
-    color: $text-secondary;
+  &.mat-focused {
+    .mat-mdc-form-field-label {
+      color: #2e7d32;
+    }
   }
 }
 
-// Alert Styles
-.alert {
-  padding: $spacing-sm $spacing-md;
-  border-radius: $input-border-radius;
-  margin-bottom: $spacing-lg;
+// Custom toolbar
+.mat-toolbar.mat-primary {
+  background-color: #2e7d32;
+  color: white;
 }
 
-.alert-success {
-  background-color: #d4edda;
-  color: #155724;
-  border: 1px solid #c3e6cb;
+// Custom chips
+.mat-mdc-chip {
+  background-color: #e8f5e9;
+  color: #2e7d32;
 }
 
-.alert-error {
-  background-color: #f8d7da;
-  color: #721c24;
-  border: 1px solid #f5c6cb;
+// Custom progress bar
+.mat-mdc-progress-bar {
+  .mdc-linear-progress__buffer {
+    background-color: #e8f5e9;
+  }
+  
+  .mdc-linear-progress__bar-inner {
+    background-color: #4caf50;
+  }
 }
-
-.alert-info {
-  background-color: #d1ecf1;
-  color: #0c5460;
-  border: 1px solid #bee5eb;
-}
-
-// Utility Classes
-.text-center {
-  text-align: center;
-}
-
-.mt-1 { margin-top: $spacing-xs; }
-.mt-2 { margin-top: $spacing-md; }
-.mt-3 { margin-top: $spacing-xl; }
-.mb-1 { margin-bottom: $spacing-xs; }
-.mb-2 { margin-bottom: $spacing-md; }
-.mb-3 { margin-bottom: $spacing-xl; }
-
-// Loading Spinner
-.loading {
-  display: inline-block;
-  width: 20px;
-  height: 20px;
-  border: 3px solid rgba(255, 255, 255, 0.3);
-  border-radius: 50%;
-  border-top-color: white;
-  animation: spin 1s ease-in-out infinite;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-

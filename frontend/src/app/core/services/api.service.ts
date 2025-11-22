@@ -1,67 +1,48 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
 /**
- * API Service - HTTP client wrapper
+ * Base API service for HTTP requests
  */
 @Injectable({
   providedIn: 'root'
 })
 export class ApiService {
-  private readonly apiUrl = environment.apiUrl;
+  private readonly baseUrl: string;
 
-  constructor(private http: HttpClient) {}
-
-  /**
-   * GET request
-   */
-  get<T>(endpoint: string, params?: any): Observable<T> {
-    const url = `${this.apiUrl}${endpoint}`;
-    const httpParams = this.buildParams(params);
-    return this.http.get<T>(url, { params: httpParams });
+  constructor(private http: HttpClient) {
+    this.baseUrl = environment.apiUrl;
   }
 
   /**
-   * POST request
+   * Get request
    */
-  post<T>(endpoint: string, data: any): Observable<T> {
-    const url = `${this.apiUrl}${endpoint}`;
-    return this.http.post<T>(url, data);
+  get<T>(endpoint: string, params?: HttpParams): Observable<T> {
+    return this.http.get<T>(`${this.baseUrl}${endpoint}`, { params });
   }
 
   /**
-   * PUT request
+   * Post request
    */
-  put<T>(endpoint: string, data: any): Observable<T> {
-    const url = `${this.apiUrl}${endpoint}`;
-    return this.http.put<T>(url, data);
+  post<T>(endpoint: string, body: any): Observable<T> {
+    return this.http.post<T>(`${this.baseUrl}${endpoint}`, body);
   }
 
   /**
-   * DELETE request
+   * Put request
+   */
+  put<T>(endpoint: string, body: any): Observable<T> {
+    return this.http.put<T>(`${this.baseUrl}${endpoint}`, body);
+  }
+
+  /**
+   * Delete request
    */
   delete<T>(endpoint: string): Observable<T> {
-    const url = `${this.apiUrl}${endpoint}`;
-    return this.http.delete<T>(url);
-  }
-
-  /**
-   * Build HTTP params from object
-   */
-  private buildParams(params?: any): HttpParams {
-    let httpParams = new HttpParams();
-    
-    if (params) {
-      Object.keys(params).forEach(key => {
-        if (params[key] !== null && params[key] !== undefined) {
-          httpParams = httpParams.set(key, params[key].toString());
-        }
-      });
-    }
-    
-    return httpParams;
+    return this.http.delete<T>(`${this.baseUrl}${endpoint}`);
   }
 }
+
 

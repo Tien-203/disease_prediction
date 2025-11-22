@@ -1,0 +1,37 @@
+<mat-toolbar color="primary">
+  <button mat-icon-button routerLink="/" aria-label="Home">
+    <mat-icon>local_hospital</mat-icon>
+  </button>
+  <span class="app-title">Disease Prediction</span>
+
+  <span class="spacer"></span>
+
+  @if (currentUser) {
+    <nav class="nav-items">
+      @for (item of getNavigationItems(); track item.route) {
+        <button mat-button [routerLink]="item.route" routerLinkActive="active">
+          <mat-icon>{{ item.icon }}</mat-icon>
+          <span>{{ item.label }}</span>
+        </button>
+      }
+    </nav>
+
+    <button mat-icon-button [matMenuTriggerFor]="userMenu" aria-label="User menu">
+      <mat-icon>account_circle</mat-icon>
+    </button>
+    <mat-menu #userMenu="matMenu">
+      <div class="user-info">
+        <div class="user-name">{{ currentUser.name || currentUser.email }}</div>
+        <div class="user-role">{{ currentUser.role | roleDisplay }}</div>
+      </div>
+      <mat-divider></mat-divider>
+      <button mat-menu-item (click)="logout()">
+        <mat-icon>logout</mat-icon>
+        <span>Logout</span>
+      </button>
+    </mat-menu>
+  } @else {
+    <button mat-button routerLink="/auth/login">Login</button>
+    <button mat-button routerLink="/auth/register">Register</button>
+  }
+</mat-toolbar>

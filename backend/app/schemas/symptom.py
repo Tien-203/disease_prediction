@@ -36,3 +36,22 @@ class SymptomListResponse(BaseModel):
     symptoms: list[SymptomResponse]
     total: int
 
+
+class SymptomOption(BaseModel):
+    """Schema for a symptom option in a group"""
+    id: int
+    name: str
+    display_name: str  # Human-readable name
+
+
+class SymptomGroup(BaseModel):
+    """Schema for a group of symptoms (question)"""
+    id: str  # Category ID
+    question: str  # Question text
+    options: list[SymptomOption]  # Available symptom options
+    allow_multiple: bool = True  # Whether multiple selections are allowed
+
+
+class SymptomGroupsResponse(BaseModel):
+    """Schema for grouped symptoms response"""
+    groups: list[SymptomGroup]

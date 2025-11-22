@@ -8,7 +8,8 @@ from app.schemas.symptom import (
     SymptomCreate,
     SymptomUpdate,
     SymptomResponse,
-    SymptomListResponse
+    SymptomListResponse,
+    SymptomGroupsResponse
 )
 from app.services.symptom_service import SymptomService
 
@@ -32,6 +33,19 @@ def get_symptoms(
     symptoms, total = service.get_all_symptoms(skip=skip, limit=limit)
     
     return SymptomListResponse(symptoms=symptoms, total=total)
+
+
+@router.get("/groups", response_model=SymptomGroupsResponse)
+def get_grouped_symptoms(
+    db: Session = Depends(get_db)
+):
+    """
+    Get symptoms grouped by categories for quick check questions
+    
+    Returns grouped symptoms organized by common characteristics
+    """
+    service = SymptomService(db)
+    return service.get_grouped_symptoms()
 
 
 @router.get("/{symptom_id}", response_model=SymptomResponse)

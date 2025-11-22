@@ -1,0 +1,131 @@
+@import '../../../styles/design-tokens';
+
+.app-header {
+  width: 100%;
+  background-color: $dark-green;
+  color: $text-on-dark;
+  padding: $spacing-lg $spacing-3xl;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.app-header__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: $container-max-width;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.app-header__brand {
+  flex: 1;
+}
+
+.app-header__logo {
+  font-size: $font-size-large;
+  font-weight: $font-weight-bold;
+  color: $text-on-dark;
+  text-decoration: none;
+  letter-spacing: 0.3px;
+
+  &:hover {
+    opacity: 0.9;
+  }
+}
+
+.app-header__nav {
+  display: flex;
+  align-items: center;
+  gap: $spacing-2xl;
+}
+
+.app-header__link {
+  color: rgba(255, 255, 255, 0.85);
+  text-decoration: none;
+  font-size: $font-size-base;
+  font-weight: $font-weight-medium;
+  position: relative;
+  transition: color 0.2s ease;
+  padding: 4px 0;
+
+  &::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -6px;
+    width: 0;
+    height: 3px;
+    border-radius: 999px;
+    background-color: $lime-green;
+    transition: width 0.2s ease;
+  }
+
+  &:hover::after,
+  &--active::after {
+    width: 100%;
+  }
+
+  &:hover,
+  &--active {
+    color: $text-on-dark;
+  }
+}
+
+.app-header__logout {
+  border: none;
+  border-radius: $button-border-radius;
+  padding: 10px $spacing-xl;
+  background-color: $lime-green;
+  color: $dark-green;
+  font-weight: $font-weight-bold;
+  font-size: $font-size-small;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    background-color: $primary-hover;
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+.app-header__guest {
+  .app-header__link {
+    font-size: $font-size-base;
+  }
+}
+
+.app-header__link--guest::after {
+  display: none;
+}
+
+// Responsive
+@media (max-width: $breakpoint-sm) {
+  .app-header {
+    padding: $spacing-md $spacing-lg;
+  }
+
+  .app-header__inner {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: $spacing-md;
+  }
+
+  .app-header__nav {
+    width: 100%;
+    flex-wrap: wrap;
+    gap: $spacing-md;
+  }
+
+  .app-header__logo {
+    font-size: $font-size-base;
+  }
+}

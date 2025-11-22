@@ -1,0 +1,13 @@
+<div class="app-container">
+  <app-header *ngIf="showHeader"></app-header>
+
+  <main class="main-content" [class.main-content--full]="!showHeader">
+    <router-outlet></router-outlet>
+  </main>
+
+  <footer class="footer" *ngIf="showFooter">
+    <div class="container">
+      <p>{{ footerText }}</p>
+    </div>
+  </footer>
+</div>

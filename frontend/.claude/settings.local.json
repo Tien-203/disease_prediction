@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(powershell -Command \"Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser -Force\")",
+      "Bash(powershell -Command \"Get-ExecutionPolicy -Scope CurrentUser\")",
+      "Bash(npm --version)",
+      "WebFetch(domain:www.figma.com)",
+      "Bash(npm install bootstrap@5.3.2 @ng-bootstrap/ng-bootstrap@15.0.0 @auth0/angular-jwt ng-zorro-antd@17.0.0)",
+      "Bash(npm install bootstrap@5.3.2 ng-zorro-antd@17.4.1 jwt-decode)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

@@ -1,0 +1,34 @@
+<header class="app-header">
+  <div class="app-header__inner">
+    <div class="app-header__brand">
+      <a [routerLink]="homeRoute" class="app-header__logo">
+        {{ appName }}
+      </a>
+    </div>
+
+    <ng-container *ngIf="isAuthenticated; else guestNav">
+      <nav class="app-header__nav">
+        <a
+          *ngFor="let link of navLinks"
+          [routerLink]="link.path"
+          routerLinkActive="app-header__link--active"
+          [routerLinkActiveOptions]="link.exact ? exactMatch : defaultMatch"
+          class="app-header__link"
+        >
+          {{ link.label }}
+        </a>
+        <button type="button" class="app-header__logout" (click)="logout()" aria-label="Logout">
+          Log Out
+        </button>
+      </nav>
+    </ng-container>
+
+    <ng-template #guestNav>
+      <div class="app-header__guest">
+        <a routerLink="/login" class="app-header__link app-header__link--guest">
+          Login
+        </a>
+      </div>
+    </ng-template>
+  </div>
+</header>

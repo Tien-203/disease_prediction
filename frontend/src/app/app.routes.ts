@@ -24,7 +24,7 @@ export const routes: Routes = [
   {
     path: '',
     pathMatch: 'full',
-    redirectTo: 'login'
+    redirectTo: 'patient'
   },
   {
     path: 'patient',
@@ -113,7 +113,7 @@ export const routes: Routes = [
   },
   {
     path: '**',
-    redirectTo: 'login'
+    redirectTo: 'patient'
   }
 ];
 

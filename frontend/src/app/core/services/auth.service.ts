@@ -3,6 +3,7 @@ import { BehaviorSubject, Observable, throwError, of } from 'rxjs';
 import { tap, catchError, map } from 'rxjs/operators';
 import { ApiService } from './api.service';
 import { Router } from '@angular/router';
+import { jwtDecode } from 'jwt-decode';
 
 /**
  * Authentication Service
@@ -21,7 +22,37 @@ export class AuthService {
   constructor(
     private apiService: ApiService,
     private router: Router
-  ) {}
+  ) {
+    // Auto-login for development/demo (bypass authentication)
+    // this.autoLogin(); // COMMENTED OUT - Disable auto-login to require real authentication
+  }
+
+  /**
+   * Auto-login as default user (for school project demo)
+   */
+  private autoLogin(): void {
+    // Check if already authenticated
+    if (this.hasToken()) {
+      this.isAuthenticatedSubject.next(true);
+      return;
+    }
+
+    // Create a mock session
+    const mockUser = {
+      id: 1,
+      email: 'demo@patient.com',
+      name: 'Demo Patient',
+      role: 'patient',
+      is_active: true,
+      created_at: new Date().toISOString()
+    };
+
+    localStorage.setItem(this.TOKEN_KEY, 'mock-session-token');
+    localStorage.setItem(this.USER_KEY, JSON.stringify(mockUser));
+    this.isAuthenticatedSubject.next(true);
+
+    console.log('Auto-login enabled with mock user:', mockUser);
+  }
 
   /**
    * Check if user has a valid token
@@ -127,12 +158,47 @@ export class AuthService {
   }
 
   /**
+   * Switch user role (for demo purposes)
+   */
+  switchRole(role: 'patient' | 'doctor' | 'researcher' | 'data_scientist', name?: string): void {
+    const mockUsers = {
+      patient: { id: 1, email: 'demo@patient.com', name: 'Demo Patient', role: 'patient' },
+      doctor: { id: 2, email: 'demo@doctor.com', name: 'Dr. Demo', role: 'doctor' },
+      researcher: { id: 3, email: 'demo@researcher.com', name: 'Demo Researcher', role: 'researcher' },
+      data_scientist: { id: 4, email: 'demo@datascientist.com', name: 'Demo Data Scientist', role: 'data_scientist' }
+    };
+
+    const mockUser = {
+      ...mockUsers[role],
+      name: name || mockUsers[role].name,
+      is_active: true,
+      created_at: new Date().toISOString()
+    };
+
+    localStorage.setItem(this.USER_KEY, JSON.stringify(mockUser));
+    this.isAuthenticatedSubject.next(true);
+
+    console.log('Switched to role:', role, mockUser);
+
+    // Navigate to appropriate dashboard
+    const routes: Record<string, string> = {
+      patient: '/patient',
+      doctor: '/doctor',
+      researcher: '/researcher',
+      data_scientist: '/ds'
+    };
+
+    this.router.navigate([routes[role]]);
+  }
+
+  /**
    * Logout user
    */
   logout(): void {
     localStorage.removeItem(this.TOKEN_KEY);
     localStorage.removeItem(this.USER_KEY);
     this.isAuthenticatedSubject.next(false);
+    // Navigate to login page
     this.router.navigate(['/login']);
   }
 
@@ -156,6 +222,46 @@ export class AuthService {
    */
   isAuthenticated(): boolean {
     return this.isAuthenticatedSubject.value;
+  }
+
+  /**
+   * Get user role from token or localStorage
+   */
+  getUserRole(): string | null {
+    const user = this.getCurrentUser();
+    if (user && user.role) {
+      return user.role.toLowerCase();
+    }
+
+    // Try to decode token as fallback
+    const token = this.getToken();
+    if (token && token !== 'session') {
+      try {
+        const decoded: any = jwtDecode(token);
+        return decoded.role ? decoded.role.toLowerCase() : null;
+      } catch (error) {
+        console.error('Error decoding token:', error);
+        return null;
+      }
+    }
+
+    return null;
+  }
+
+  /**
+   * Check if user has a specific role
+   */
+  hasRole(role: string): boolean {
+    const userRole = this.getUserRole();
+    return userRole === role.toLowerCase();
+  }
+
+  /**
+   * Check if user has any of the specified roles
+   */
+  hasAnyRole(roles: string[]): boolean {
+    const userRole = this.getUserRole();
+    return roles.some(role => role.toLowerCase() === userRole);
   }
 
   private handleAuthSuccess(

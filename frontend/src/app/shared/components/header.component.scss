@@ -1,0 +1,86 @@
+@import '../../../styles/design-tokens';
+
+// Custom dark green background
+.bg-dark-green {
+  background-color: $dark-green;
+}
+
+// Header Logo
+.header-logo {
+  transition: opacity 0.2s ease;
+
+  &:hover {
+    opacity: 0.85;
+  }
+}
+
+// Nav Links with underline effect
+.nav-link {
+  position: relative;
+  transition: color 0.2s ease;
+
+  &::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -6px;
+    width: 0;
+    height: 3px;
+    border-radius: 999px;
+    background-color: $lime-green;
+    transition: width 0.2s ease;
+  }
+
+  &:hover {
+    color: white !important;
+
+    &::after {
+      width: 100%;
+    }
+  }
+
+  &.nav-link-active {
+    color: white !important;
+
+    &::after {
+      width: 100%;
+    }
+  }
+}
+
+// Role Switcher Button
+.btn-role-switcher {
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  background-color: rgba(255, 255, 255, 0.1);
+  color: white;
+  padding: 6px 16px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.5);
+    color: white;
+  }
+}
+
+.dropdown-arrow {
+  font-size: 10px;
+}
+
+// Role Dropdown Menu
+.role-dropdown-menu {
+  min-width: 200px;
+
+  li {
+    &.active {
+      background-color: rgba(139, 195, 74, 0.15);
+      font-weight: 600;
+      color: $dark-green;
+    }
+
+    &:hover {
+      background-color: rgba(139, 195, 74, 0.1);
+    }
+  }
+}

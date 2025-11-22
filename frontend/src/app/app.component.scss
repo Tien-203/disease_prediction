@@ -1,0 +1,10 @@
+@import '../styles/design-tokens';
+
+// Custom background colors
+.bg-dark-green {
+  background-color: $dark-green;
+}
+
+.footer {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}

@@ -1,0 +1,70 @@
+<header class="app-header bg-dark-green text-white shadow-sm sticky-top">
+  <div class="container-fluid d-flex align-items-center justify-content-between py-3 px-4">
+    <!-- Brand Logo -->
+    <div class="header-brand">
+      <a [routerLink]="homeRoute" class="header-logo text-white text-decoration-none fw-bold fs-5">
+        {{ appName }}
+      </a>
+    </div>
+
+    <!-- Authenticated Navigation -->
+    <ng-container *ngIf="isAuthenticated; else guestNav">
+      <nav class="d-flex align-items-center gap-4">
+        <!-- Nav Links -->
+        <a
+          *ngFor="let link of navLinks"
+          [routerLink]="link.path"
+          routerLinkActive="nav-link-active"
+          [routerLinkActiveOptions]="link.exact ? exactMatch : defaultMatch"
+          class="nav-link text-white-50 text-decoration-none fw-medium"
+        >
+          {{ link.label }}
+        </a>
+
+        <!-- Role Switcher Dropdown -->
+        <div class="dropdown" nz-dropdown [nzDropdownMenu]="roleMenu" nzTrigger="click">
+          <button
+            nz-button
+            nzType="default"
+            class="btn-role-switcher d-flex align-items-center gap-2"
+          >
+            <span>{{ currentRoleDisplay }}</span>
+            <span class="dropdown-arrow">▼</span>
+          </button>
+        </div>
+
+        <nz-dropdown-menu #roleMenu="nzDropdownMenu">
+          <ul nz-menu class="role-dropdown-menu">
+            <li
+              nz-menu-item
+              *ngFor="let role of availableRoles"
+              [class.active]="isRoleActive(role.value)"
+              (click)="switchRole(role.value)"
+            >
+              <span class="me-2">{{ role.icon }}</span>
+              <span>{{ role.label }}</span>
+            </li>
+          </ul>
+        </nz-dropdown-menu>
+
+        <!-- Logout Button -->
+        <button
+          type="button"
+          class="btn btn-success btn-sm fw-bold"
+          (click)="logout()"
+        >
+          Log Out
+        </button>
+      </nav>
+    </ng-container>
+
+    <!-- Guest Navigation -->
+    <ng-template #guestNav>
+      <div class="header-guest">
+        <a routerLink="/login" class="btn btn-outline-light btn-sm">
+          Login
+        </a>
+      </div>
+    </ng-template>
+  </div>
+</header>

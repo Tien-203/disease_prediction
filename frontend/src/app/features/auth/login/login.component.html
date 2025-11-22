@@ -1,49 +1,53 @@
-<div class="login-page">
-  <div class="login-page__card">
-    <h1 class="login-page__title">
-      Welcome to Symptom-Based Prediction Application
-    </h1>
-    <p class="login-page__subtitle">Please log in to your account</p>
+<div class="min-vh-100 d-flex align-items-center justify-content-center p-4 bg-gradient-light">
+  <div class="login-card card shadow-lg border-primary" style="max-width: 420px; width: 100%;">
+    <div class="card-body p-5">
+      <h1 class="text-center fw-bold mb-2 fs-4 text-white">
+        Welcome to Symptom-Based Prediction Application
+      </h1>
+      <p class="text-center mb-4 text-white-subtle">Please log in to your account</p>
 
-    <div *ngIf="error" class="login-page__error" role="alert">
-      {{ error }}
-    </div>
+      <nz-alert
+        *ngIf="error"
+        nzType="error"
+        [nzMessage]="error"
+        nzShowIcon
+        class="mb-3"
+      ></nz-alert>
 
-    <form class="login-form" (ngSubmit)="onSubmit()" novalidate>
-      <div class="form-field">
-        <label class="form-label" for="email">Email</label>
-        <input
-          type="email"
-          id="email"
-          class="form-control"
-          [(ngModel)]="email"
-          name="email"
-          placeholder="example@gmail.com"
-          required
-          [disabled]="loading"
-        />
-      </div>
+      <form (ngSubmit)="onSubmit()" novalidate>
+        <div class="mb-3">
+          <label for="email" class="form-label text-white-subtle fw-medium small">Email</label>
+          <input
+            type="email"
+            id="email"
+            class="form-control form-control-lg"
+            [(ngModel)]="email"
+            name="email"
+            placeholder="example@gmail.com"
+            required
+            [disabled]="loading"
+          />
+        </div>
 
-      <div class="form-field">
-        <label class="form-label" for="password">Password</label>
-        <input
-          type="password"
-          id="password"
-          class="form-control"
-          [(ngModel)]="password"
-          name="password"
-          placeholder="Password"
-          required
-          [disabled]="loading"
-        />
-      </div>
+        <div class="mb-3">
+          <label for="password" class="form-label text-white-subtle fw-medium small">Password</label>
+          <input
+            type="password"
+            id="password"
+            class="form-control form-control-lg"
+            [(ngModel)]="password"
+            name="password"
+            placeholder="Password"
+            required
+            [disabled]="loading"
+          />
+        </div>
 
-      <div class="form-field">
-        <label class="form-label" for="role">Login as</label>
-        <div class="select-wrapper">
+        <div class="mb-4">
+          <label for="role" class="form-label text-white-subtle fw-medium small">Login as</label>
           <select
             id="role"
-            class="form-control form-control--select"
+            class="form-select form-select-lg"
             [(ngModel)]="selectedRole"
             name="role"
             required
@@ -53,23 +57,25 @@
               {{ option.label }}
             </option>
           </select>
-          <span class="select-icon" aria-hidden="true">▾</span>
         </div>
-      </div>
 
-      <button
-        class="login-button"
-        type="submit"
-        [disabled]="loading"
-      >
-        <span *ngIf="!loading">Log in</span>
-        <span *ngIf="loading">Logging in...</span>
-      </button>
-    </form>
+        <button
+          class="btn btn-success btn-lg w-100 fw-bold"
+          type="submit"
+          [disabled]="loading"
+        >
+          <span *ngIf="!loading">Log in</span>
+          <span *ngIf="loading">
+            <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+            Logging in...
+          </span>
+        </button>
+      </form>
 
-    <p class="login-page__footer">
-      Don't have an account?
-      <a routerLink="/register">Sign up</a>
-    </p>
+      <p class="text-center mt-4 mb-0 text-white-subtle small">
+        Don't have an account?
+        <a routerLink="/register" class="text-success fw-semibold text-decoration-none">Sign up</a>
+      </p>
+    </div>
   </div>
 </div>

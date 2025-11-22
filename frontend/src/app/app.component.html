@@ -1,13 +1,13 @@
-<div class="app-container">
+<div class="d-flex flex-column min-vh-100 bg-light">
   <app-header *ngIf="showHeader"></app-header>
 
-  <main class="main-content" [class.main-content--full]="!showHeader">
+  <main class="flex-grow-1 w-100" [class.d-flex]="!showHeader" [class.align-items-center]="!showHeader" [class.justify-content-center]="!showHeader">
     <router-outlet></router-outlet>
   </main>
 
-  <footer class="footer" *ngIf="showFooter">
+  <footer class="footer bg-dark-green text-white text-center py-4 border-top" *ngIf="showFooter">
     <div class="container">
-      <p>{{ footerText }}</p>
+      <p class="mb-0 small opacity-75">{{ footerText }}</p>
     </div>
   </footer>
 </div>

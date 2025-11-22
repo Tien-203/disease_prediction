@@ -1,55 +1,23 @@
 @import '../../../styles/design-tokens';
 
-.app-header {
-  width: 100%;
+// Custom dark green background
+.bg-dark-green {
   background-color: $dark-green;
-  color: $text-on-dark;
-  padding: $spacing-lg $spacing-3xl;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  position: sticky;
-  top: 0;
-  z-index: 100;
 }
 
-.app-header__inner {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  max-width: $container-max-width;
-  margin: 0 auto;
-  width: 100%;
-}
-
-.app-header__brand {
-  flex: 1;
-}
-
-.app-header__logo {
-  font-size: $font-size-large;
-  font-weight: $font-weight-bold;
-  color: $text-on-dark;
-  text-decoration: none;
-  letter-spacing: 0.3px;
+// Header Logo
+.header-logo {
+  transition: opacity 0.2s ease;
 
   &:hover {
-    opacity: 0.9;
+    opacity: 0.85;
   }
 }
 
-.app-header__nav {
-  display: flex;
-  align-items: center;
-  gap: $spacing-2xl;
-}
-
-.app-header__link {
-  color: rgba(255, 255, 255, 0.85);
-  text-decoration: none;
-  font-size: $font-size-base;
-  font-weight: $font-weight-medium;
+// Nav Links with underline effect
+.nav-link {
   position: relative;
   transition: color 0.2s ease;
-  padding: 4px 0;
 
   &::after {
     content: '';
@@ -63,166 +31,56 @@
     transition: width 0.2s ease;
   }
 
-  &:hover::after,
-  &--active::after {
-    width: 100%;
+  &:hover {
+    color: white !important;
+
+    &::after {
+      width: 100%;
+    }
   }
 
-  &:hover,
-  &--active {
-    color: $text-on-dark;
+  &.nav-link-active {
+    color: white !important;
+
+    &::after {
+      width: 100%;
+    }
   }
 }
 
-// Role Switcher
-.app-header__role-switcher {
-  position: relative;
-}
-
-.app-header__role-button {
+// Role Switcher Button
+.btn-role-switcher {
   border: 2px solid rgba(255, 255, 255, 0.3);
-  border-radius: $button-border-radius;
-  padding: 8px $spacing-lg;
   background-color: rgba(255, 255, 255, 0.1);
-  color: $text-on-dark;
-  font-weight: $font-weight-medium;
-  font-size: $font-size-small;
-  cursor: pointer;
+  color: white;
+  padding: 6px 16px;
+  border-radius: 6px;
   transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  gap: $spacing-sm;
-  white-space: nowrap;
 
   &:hover {
     background-color: rgba(255, 255, 255, 0.2);
     border-color: rgba(255, 255, 255, 0.5);
+    color: white;
   }
 }
 
-.app-header__role-arrow {
+.dropdown-arrow {
   font-size: 10px;
-  transition: transform 0.2s ease;
-  display: inline-block;
-
-  &--open {
-    transform: rotate(180deg);
-  }
 }
 
-.app-header__role-dropdown {
-  position: absolute;
-  top: calc(100% + 8px);
-  right: 0;
-  background-color: white;
-  border-radius: 8px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+// Role Dropdown Menu
+.role-dropdown-menu {
   min-width: 200px;
-  overflow: hidden;
-  z-index: 1000;
-  animation: fadeInDown 0.2s ease;
-}
 
-@keyframes fadeInDown {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
+  li {
+    &.active {
+      background-color: rgba(139, 195, 74, 0.15);
+      font-weight: 600;
+      color: $dark-green;
+    }
 
-.app-header__role-option {
-  width: 100%;
-  border: none;
-  background: white;
-  padding: 12px $spacing-lg;
-  display: flex;
-  align-items: center;
-  gap: $spacing-md;
-  cursor: pointer;
-  transition: background-color 0.15s ease;
-  font-size: $font-size-small;
-  color: #333;
-  text-align: left;
-
-  &:hover {
-    background-color: rgba(139, 195, 74, 0.1);
-  }
-
-  &--active {
-    background-color: rgba(139, 195, 74, 0.15);
-    font-weight: $font-weight-bold;
-    color: $dark-green;
-  }
-
-  &:not(:last-child) {
-    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-  }
-}
-
-.app-header__role-icon {
-  font-size: 18px;
-}
-
-.app-header__role-label {
-  flex: 1;
-}
-
-.app-header__logout {
-  border: none;
-  border-radius: $button-border-radius;
-  padding: 10px $spacing-xl;
-  background-color: $lime-green;
-  color: $dark-green;
-  font-weight: $font-weight-bold;
-  font-size: $font-size-small;
-  cursor: pointer;
-  transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-    background-color: $primary-hover;
-  }
-
-  &:active {
-    transform: translateY(0);
-  }
-}
-
-.app-header__guest {
-  .app-header__link {
-    font-size: $font-size-base;
-  }
-}
-
-.app-header__link--guest::after {
-  display: none;
-}
-
-// Responsive
-@media (max-width: $breakpoint-sm) {
-  .app-header {
-    padding: $spacing-md $spacing-lg;
-  }
-
-  .app-header__inner {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: $spacing-md;
-  }
-
-  .app-header__nav {
-    width: 100%;
-    flex-wrap: wrap;
-    gap: $spacing-md;
-  }
-
-  .app-header__logo {
-    font-size: $font-size-base;
+    &:hover {
+      background-color: rgba(139, 195, 74, 0.1);
+    }
   }
 }

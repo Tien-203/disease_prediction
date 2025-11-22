@@ -1,19 +1,21 @@
-import { Component, OnDestroy, OnInit, HostListener } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
 import { AuthService } from '../../core/services/auth.service';
 import { environment } from '../../../environments/environment';
 import { NavLink, ROLE_NAV_LINKS, getHomeRouteForRole } from '../../core/config/routes.config';
+import { NzDropDownModule } from 'ng-zorro-antd/dropdown';
+import { NzButtonModule } from 'ng-zorro-antd/button';
 
 /**
  * Header Component
- * Main navigation header with role-based menu
+ * Main navigation header with role-based menu using Bootstrap 5 and Ant Design
  */
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [RouterLink, RouterLinkActive, CommonModule],
+  imports: [RouterLink, RouterLinkActive, CommonModule, NzDropDownModule, NzButtonModule],
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.scss']
 })
@@ -51,19 +53,6 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.subscription?.unsubscribe();
-  }
-
-  /**
-   * Close role switcher when clicking outside
-   */
-  @HostListener('document:click', ['$event'])
-  onDocumentClick(event: MouseEvent): void {
-    const target = event.target as HTMLElement;
-    const roleSwitcher = target.closest('.app-header__role-switcher');
-
-    if (!roleSwitcher && this.showRoleSwitcher) {
-      this.showRoleSwitcher = false;
-    }
   }
 
   /**

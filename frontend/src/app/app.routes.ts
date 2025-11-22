@@ -24,7 +24,7 @@ export const routes: Routes = [
   {
     path: '',
     pathMatch: 'full',
-    redirectTo: 'patient'
+    redirectTo: 'login' // Changed back to login for normal authentication
   },
   {
     path: 'patient',
@@ -113,7 +113,7 @@ export const routes: Routes = [
   },
   {
     path: '**',
-    redirectTo: 'patient'
+    redirectTo: 'login' // Changed back to login for normal authentication
   }
 ];
 

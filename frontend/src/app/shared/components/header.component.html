@@ -17,6 +17,33 @@
         >
           {{ link.label }}
         </a>
+
+        <!-- Role Switcher Dropdown -->
+        <div class="app-header__role-switcher">
+          <button
+            type="button"
+            class="app-header__role-button"
+            (click)="toggleRoleSwitcher()"
+            aria-label="Switch role"
+          >
+            {{ currentRoleDisplay }}
+            <span class="app-header__role-arrow" [class.app-header__role-arrow--open]="showRoleSwitcher">▼</span>
+          </button>
+
+          <div class="app-header__role-dropdown" *ngIf="showRoleSwitcher">
+            <button
+              *ngFor="let role of availableRoles"
+              type="button"
+              class="app-header__role-option"
+              [class.app-header__role-option--active]="isRoleActive(role.value)"
+              (click)="switchRole(role.value)"
+            >
+              <span class="app-header__role-icon">{{ role.icon }}</span>
+              <span class="app-header__role-label">{{ role.label }}</span>
+            </button>
+          </div>
+        </div>
+
         <button type="button" class="app-header__logout" (click)="logout()" aria-label="Logout">
           Log Out
         </button>

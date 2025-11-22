@@ -74,6 +74,103 @@
   }
 }
 
+// Role Switcher
+.app-header__role-switcher {
+  position: relative;
+}
+
+.app-header__role-button {
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: $button-border-radius;
+  padding: 8px $spacing-lg;
+  background-color: rgba(255, 255, 255, 0.1);
+  color: $text-on-dark;
+  font-weight: $font-weight-medium;
+  font-size: $font-size-small;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  white-space: nowrap;
+
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.5);
+  }
+}
+
+.app-header__role-arrow {
+  font-size: 10px;
+  transition: transform 0.2s ease;
+  display: inline-block;
+
+  &--open {
+    transform: rotate(180deg);
+  }
+}
+
+.app-header__role-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  min-width: 200px;
+  overflow: hidden;
+  z-index: 1000;
+  animation: fadeInDown 0.2s ease;
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.app-header__role-option {
+  width: 100%;
+  border: none;
+  background: white;
+  padding: 12px $spacing-lg;
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+  font-size: $font-size-small;
+  color: #333;
+  text-align: left;
+
+  &:hover {
+    background-color: rgba(139, 195, 74, 0.1);
+  }
+
+  &--active {
+    background-color: rgba(139, 195, 74, 0.15);
+    font-weight: $font-weight-bold;
+    color: $dark-green;
+  }
+
+  &:not(:last-child) {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  }
+}
+
+.app-header__role-icon {
+  font-size: 18px;
+}
+
+.app-header__role-label {
+  flex: 1;
+}
+
 .app-header__logout {
   border: none;
   border-radius: $button-border-radius;

@@ -5,17 +5,15 @@ import { Subscription } from 'rxjs';
 import { AuthService } from '../../core/services/auth.service';
 import { environment } from '../../../environments/environment';
 import { NavLink, ROLE_NAV_LINKS, getHomeRouteForRole } from '../../core/config/routes.config';
-import { NzDropDownModule } from 'ng-zorro-antd/dropdown';
-import { NzButtonModule } from 'ng-zorro-antd/button';
 
 /**
  * Header Component
- * Main navigation header with role-based menu using Bootstrap 5 and Ant Design
+ * Main navigation header with role-based menu
  */
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [RouterLink, RouterLinkActive, CommonModule, NzDropDownModule, NzButtonModule],
+  imports: [RouterLink, RouterLinkActive, CommonModule],
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.scss']
 })
@@ -30,15 +28,6 @@ export class HeaderComponent implements OnInit, OnDestroy {
   // Router link options
   readonly exactMatch = { exact: true as const };
   readonly defaultMatch = { exact: false as const };
-
-  // Role switcher
-  showRoleSwitcher = false;
-  readonly availableRoles: Array<{ value: 'patient' | 'doctor' | 'researcher' | 'data_scientist'; label: string; icon: string }> = [
-    { value: 'patient', label: 'Patient', icon: '👤' },
-    { value: 'doctor', label: 'Doctor', icon: '👨‍⚕️' },
-    { value: 'researcher', label: 'Researcher', icon: '🔬' },
-    { value: 'data_scientist', label: 'Data Scientist', icon: '📊' }
-  ];
 
   private subscription?: Subscription;
 
@@ -75,43 +64,11 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Toggle role switcher dropdown
-   */
-  toggleRoleSwitcher(): void {
-    this.showRoleSwitcher = !this.showRoleSwitcher;
-  }
-
-  /**
-   * Switch to a different role
-   */
-  switchRole(role: 'patient' | 'doctor' | 'researcher' | 'data_scientist'): void {
-    this.authService.switchRole(role);
-    this.showRoleSwitcher = false;
-  }
-
-  /**
-   * Get current role display name
-   */
-  get currentRoleDisplay(): string {
-    const role = this.normalizeRole(this.currentUser?.role);
-    const roleObj = this.availableRoles.find(r => r.value === role);
-    return roleObj ? `${roleObj.icon} ${roleObj.label}` : '👤 User';
-  }
-
-  /**
    * Normalize role string
    */
   normalizeRole(role?: string): string {
     if (!role) return 'patient';
     return role.toLowerCase().replace(/\s+/g, '_');
-  }
-
-  /**
-   * Check if a role is currently active
-   */
-  isRoleActive(roleValue: string): boolean {
-    const currentRole = this.normalizeRole(this.currentUser?.role);
-    return currentRole === roleValue;
   }
 
   /**

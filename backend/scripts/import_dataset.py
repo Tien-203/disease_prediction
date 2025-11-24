@@ -147,41 +147,41 @@ class DatasetImporter:
             logger.error("Database session is required for importing to database")
             return False
         
+        # Load reference data once at the beginning
+        reference_data = self.get_reference_data()
+        disease_recommendations = {}
+        symptoms_from_json = []
+        diseases_from_json = []
+        
+        if reference_data:
+            logger.info("Loading data from existing reference_data.json")
+            symptoms_from_json = reference_data.get('symptoms', [])
+            diseases_from_json = reference_data.get('diseases', [])
+            disease_recommendations = reference_data.get('disease_recommendations', {})
+        
         # Check if data already exists in database
         existing_symptoms = self.db.query(Symptom).count()
         existing_diseases = self.db.query(Disease).count()
+        
+        # Always update recommendations for existing diseases if available
+        if existing_diseases > 0 and disease_recommendations:
+            logger.info("Updating recommendations for existing diseases...")
+            updated_count = 0
+            for disease_name, recommendation in disease_recommendations.items():
+                existing = self.db.query(Disease).filter(Disease.name == disease_name.strip()).first()
+                if existing and (existing.recommendations != recommendation):
+                    existing.recommendations = recommendation
+                    updated_count += 1
+            
+            if updated_count > 0:
+                self.db.commit()
+                logger.info(f"Updated recommendations for {updated_count} existing diseases")
         
         if existing_symptoms > 0 or existing_diseases > 0:
             logger.info(f"Database already contains {existing_symptoms} symptoms and {existing_diseases} diseases")
             logger.info("Skipping database import. Use --force flag to re-import if needed.")
             return True
-        
-        # Try to extract from processed dataset first
-        symptoms_from_csv, diseases_from_csv = self.extract_from_processed_dataset()
-        
-        # Try to extract from metadata as fallback
-        features_from_metadata, classes_from_metadata = self.extract_from_metadata()
-        
-        # Try to load from existing reference_data.json if available
-        reference_data = self.get_reference_data()
-        if reference_data:
-            logger.info("Loading data from existing reference_data.json")
-            symptoms_from_json = reference_data.get('symptoms', [])
-            diseases_from_json = reference_data.get('diseases', [])
-        else:
-            symptoms_from_json = []
-            diseases_from_json = []
-        
-        # Combine data sources (prefer CSV, then metadata, then JSON)
-        if symptoms_from_csv and diseases_from_csv:
-            symptoms = sorted(list(symptoms_from_csv))
-            diseases = sorted(list(diseases_from_csv))
-            source = "processed_dataset.csv"
-        elif features_from_metadata and classes_from_metadata:
-            symptoms = sorted(features_from_metadata)
-            diseases = sorted(classes_from_metadata)
-            source = "model_metadata.json"
-        elif symptoms_from_json and diseases_from_json:
+        if symptoms_from_json and diseases_from_json:
             symptoms = symptoms_from_json
             diseases = diseases_from_json
             source = "reference_data.json"
@@ -215,22 +215,37 @@ class DatasetImporter:
             
             # Import diseases
             disease_objects = []
+            updated_count = 0
             for disease_name in diseases:
+                disease_name_clean = disease_name.strip()
                 # Check if disease already exists
-                existing = self.db.query(Disease).filter(Disease.name == disease_name).first()
+                existing = self.db.query(Disease).filter(Disease.name == disease_name_clean).first()
+                
+                # Get recommendation from reference data if available
+                recommendation = disease_recommendations.get(disease_name, None)
+                
                 if not existing:
+                    # Create new disease
                     disease_obj = Disease(
-                        name=disease_name.strip(),
+                        name=disease_name_clean,
                         description=None,  # Can be filled later if needed
                         severity=None,
                         precautions=None,
-                        recommendations=None
+                        recommendations=recommendation
                     )
                     disease_objects.append(disease_obj)
+                else:
+                    # Update existing disease with recommendation if it's missing or different
+                    if recommendation and (existing.recommendations != recommendation):
+                        existing.recommendations = recommendation
+                        updated_count += 1
             
             if disease_objects:
                 self.db.add_all(disease_objects)
                 logger.info(f"Added {len(disease_objects)} new diseases to database")
+            
+            if updated_count > 0:
+                logger.info(f"Updated recommendations for {updated_count} existing diseases")
             
             # Commit changes
             self.db.commit()

@@ -5,7 +5,7 @@ link figma: https://www.figma.com/design/McE5rlTznd6bfazTYUfZZS/Symptom-Based-Di
 link notion: https://www.notion.so/httm-2a16645d50f38024b319f15fd3d22caa
 
 ## Project Overview
-A full-stack application for disease prediction based on symptoms using Machine Learning (Random Forest classifier).
+A full-stack application for disease prediction based on symptoms using Machine Learning (Random Forest classifier). The application features role-based access control with different dashboards for patients, doctors, researchers, and data scientists.
 
 **Note**: This is a simplified structure for a school project. Focus on core functionality, not extensive testing or production deployment.
 
@@ -15,6 +15,10 @@ A full-stack application for disease prediction based on symptoms using Machine 
 - Database: PostgreSQL
 - ML: scikit-learn (Random Forest)
 - Dataset: Kaggle (via kagglehub)
+- Authentication: JWT tokens with role-based access control
+
+**Design Reference:**
+- Figma Design: [View Design](https://www.figma.com/design/McE5rlTznd6bfazTYUfZZS/Symptom-Based-Disease-Prediction-Application?node-id=0-1&t=9BhCc67J34tEXJrW-1)
 
 ---
 
@@ -35,15 +39,21 @@ This is a **school project** focusing on demonstrating:
 - ✅ ML model integration for predictions
 - ✅ Database models and migrations
 - ✅ API endpoints with proper responses
+- ✅ Authentication and authorization (JWT tokens)
+- ✅ Role-based access control (patient, doctor, researcher, data_scientist)
+- ✅ User management
 - ❌ No need for extensive unit tests
-- ❌ No need for authentication/authorization
-- ❌ No need for advanced security features
+- ❌ No need for advanced security features beyond basic auth
 
 ### Frontend (Angular)
 - ✅ Clean, functional UI
 - ✅ Forms for symptom selection
 - ✅ Display prediction results
 - ✅ Basic routing and navigation
+- ✅ Authentication (login/register)
+- ✅ Role-based dashboards and features
+- ✅ Patient home with quick check functionality
+- ✅ Doctor, Researcher, and Data Scientist dashboards
 - ❌ No need for state management (NgRx)
 - ❌ No need for extensive animations
 - ❌ No need for responsive design optimization
@@ -62,6 +72,43 @@ This is a **school project** focusing on demonstrating:
 - ❌ No need for complex relationships
 - ❌ No need for database optimization
 - ❌ No need for migrations in production
+
+---
+
+## 🎨 Key Features
+
+### Authentication & User Management
+- User registration and login with JWT tokens
+- Role-based access control (patient, doctor, researcher, data_scientist)
+- User profiles with personal information
+- Secure password hashing
+
+### Patient Features
+- **Quick Check**: Multi-step symptom selection and prediction flow
+  - Step 1: Select symptoms from searchable list
+  - Step 2: Answer optional health questions
+  - Step 3: Processing prediction
+  - Step 4: View results with confidence scores and recommendations
+- **Describe Your Feelings**: Text-based symptom input
+- **Prediction History**: View past predictions
+- **Disease Information**: Detailed disease descriptions, precautions, and recommendations
+
+### Doctor Features
+- Doctor dashboard
+- Patient management
+- Dataset access
+- Profile management
+
+### Researcher Features
+- Researcher dashboard
+- Dataset access for research
+- Profile management
+
+### Data Scientist Features
+- Data scientist dashboard
+- Dataset management
+- Model performance metrics
+- Profile management
 
 ---
 
@@ -97,6 +144,7 @@ backend/
 │   │       ├── __init__.py
 │   │       ├── endpoints/
 │   │       │   ├── __init__.py
+│   │       │   ├── auth.py                # Authentication endpoints (login/register)
 │   │       │   ├── prediction.py         # Disease prediction endpoints
 │   │       │   ├── symptoms.py           # Symptom management endpoints
 │   │       │   ├── diseases.py           # Disease information endpoints
@@ -120,10 +168,11 @@ backend/
 │   │   ├── symptom.py                    # Symptom model
 │   │   ├── disease.py                    # Disease model
 │   │   ├── prediction.py                 # Prediction history model
-│   │   └── user.py                       # User model (if needed)
+│   │   └── user.py                       # User model (authentication & roles)
 │   │
 │   ├── schemas/                          # Pydantic schemas (request/response)
 │   │   ├── __init__.py
+│   │   ├── auth.py                       # Authentication schemas
 │   │   ├── symptom.py                    # Symptom schemas
 │   │   ├── disease.py                    # Disease schemas
 │   │   ├── prediction.py                 # Prediction schemas
@@ -131,6 +180,7 @@ backend/
 │   │
 │   ├── services/                         # Business logic
 │   │   ├── __init__.py
+│   │   ├── auth_service.py               # Authentication service
 │   │   ├── prediction_service.py         # ML prediction service
 │   │   ├── symptom_service.py            # Symptom management service
 │   │   └── disease_service.py            # Disease information service
@@ -148,6 +198,11 @@ backend/
 │   ├── versions/
 │   ├── env.py
 │   └── script.py.mako
+│
+├── scripts/                              # Utility scripts
+│   ├── import_dataset.py                 # Import dataset to database
+│   ├── check_migrations.py               # Check migration status
+│   └── docker-entrypoint.sh              # Docker entrypoint script
 │
 ├── pyproject.toml                        # Python project configuration (uv)
 ├── requirements.txt                      # Python dependencies (generated)
@@ -199,15 +254,17 @@ frontend/
 ├── src/
 │   ├── app/
 │   │   ├── core/                         # Core module (singleton services)
+│   │   │   ├── config/
+│   │   │   │   └── routes.config.ts     # Route configuration
 │   │   │   ├── services/
 │   │   │   │   ├── api.service.ts        # HTTP client wrapper
-│   │   │   │   ├── error-handler.service.ts
-│   │   │   │   └── logger.service.ts
+│   │   │   │   └── auth.service.ts       # Authentication service
 │   │   │   ├── interceptors/
-│   │   │   │   ├── http-error.interceptor.ts
-│   │   │   │   └── loading.interceptor.ts
+│   │   │   │   ├── auth.interceptor.ts   # JWT token interceptor
+│   │   │   │   └── http-error.interceptor.ts
 │   │   │   ├── guards/
-│   │   │   │   └── auth.guard.ts         # If authentication needed
+│   │   │   │   ├── auth.guard.ts         # Authentication guard
+│   │   │   │   └── role.guard.ts         # Role-based access guard
 │   │   │   └── core.module.ts
 │   │   │
 │   │   ├── shared/                       # Shared module (reusable components)
@@ -216,25 +273,28 @@ frontend/
 │   │   │   │   │   ├── header.component.ts
 │   │   │   │   │   ├── header.component.html
 │   │   │   │   │   └── header.component.scss
-│   │   │   │   ├── footer/
-│   │   │   │   ├── loading-spinner/
-│   │   │   │   └── symptom-selector/    # Reusable symptom selector
+│   │   │   │   └── (other shared components)
 │   │   │   ├── directives/
 │   │   │   ├── pipes/
 │   │   │   └── shared.module.ts
 │   │   │
 │   │   ├── features/                     # Feature modules
-│   │   │   ├── home/
-│   │   │   │   ├── home.component.ts
-│   │   │   │   ├── home.component.html
-│   │   │   │   ├── home.component.scss
-│   │   │   │   └── home.routes.ts
+│   │   │   ├── auth/                     # Authentication
+│   │   │   │   ├── login/
+│   │   │   │   │   ├── login.component.ts
+│   │   │   │   │   ├── login.component.html
+│   │   │   │   │   └── login.component.scss
+│   │   │   │   └── register/
+│   │   │   │       ├── register.component.ts
+│   │   │   │       ├── register.component.html
+│   │   │   │       └── register.component.scss
 │   │   │   │
-│   │   │   ├── prediction/
-│   │   │   │   ├── components/
-│   │   │   │   │   ├── symptom-input/
-│   │   │   │   │   ├── prediction-result/
-│   │   │   │   │   └── disease-details/
+│   │   │   ├── home/                     # Patient home dashboard
+│   │   │   │   ├── home.component.ts     # Quick check functionality
+│   │   │   │   ├── home.component.html
+│   │   │   │   └── home.component.scss
+│   │   │   │
+│   │   │   ├── prediction/               # Standalone prediction page
 │   │   │   │   ├── services/
 │   │   │   │   │   └── prediction.service.ts
 │   │   │   │   ├── models/
@@ -243,20 +303,34 @@ frontend/
 │   │   │   │   │   └── prediction.model.ts
 │   │   │   │   ├── prediction.component.ts
 │   │   │   │   ├── prediction.component.html
-│   │   │   │   ├── prediction.component.scss
-│   │   │   │   └── prediction.routes.ts
+│   │   │   │   └── prediction.component.scss
 │   │   │   │
-│   │   │   ├── history/                  # Prediction history (optional)
+│   │   │   ├── history/                  # Prediction history
 │   │   │   │   ├── history.component.ts
 │   │   │   │   ├── history.component.html
-│   │   │   │   ├── history.component.scss
-│   │   │   │   └── history.routes.ts
+│   │   │   │   └── history.component.scss
 │   │   │   │
-│   │   │   └── about/
-│   │   │       ├── about.component.ts
-│   │   │       ├── about.component.html
-│   │   │       ├── about.component.scss
-│   │   │       └── about.routes.ts
+│   │   │   ├── profile/                  # User profile
+│   │   │   │   └── profile.component.ts
+│   │   │   │
+│   │   │   ├── doctor/                   # Doctor dashboard
+│   │   │   │   ├── doctor-dashboard.component.ts
+│   │   │   │   ├── doctor-profile.component.ts
+│   │   │   │   ├── doctor-dataset.component.ts
+│   │   │   │   └── doctor-patients.component.ts
+│   │   │   │
+│   │   │   ├── researcher/               # Researcher dashboard
+│   │   │   │   ├── researcher-dashboard.component.ts
+│   │   │   │   ├── researcher-profile.component.ts
+│   │   │   │   └── researcher-dataset.component.ts
+│   │   │   │
+│   │   │   ├── data-scientist/           # Data Scientist dashboard
+│   │   │   │   ├── datascientist-dashboard.component.ts
+│   │   │   │   ├── datascientist-profile.component.ts
+│   │   │   │   └── datascientist-dataset.component.ts
+│   │   │   │
+│   │   │   └── about/                    # About page
+│   │   │       └── about.component.ts
 │   │   │
 │   │   ├── app.component.ts              # Root component
 │   │   ├── app.component.html
@@ -269,6 +343,9 @@ frontend/
 │   │   ├── icons/
 │   │   └── styles/
 │   │       └── themes/
+│   │
+│   ├── styles/                           # Global styles
+│   │   └── _design-tokens.scss           # Design tokens (colors, spacing, etc.)
 │   │
 │   ├── environments/                     # Environment configurations
 │   │   ├── environment.ts                # Development
@@ -291,7 +368,22 @@ frontend/
 
 ### Tables
 
-#### 1. **symptoms**
+#### 1. **users** (Authentication & User Management)
+```sql
+id: SERIAL PRIMARY KEY
+email: VARCHAR(255) UNIQUE NOT NULL
+password_hash: VARCHAR(255) NOT NULL
+name: VARCHAR(100)
+age: INTEGER CHECK (age >= 0 AND age <= 150)
+gender: VARCHAR(20)
+role: VARCHAR(50) NOT NULL DEFAULT 'patient' CHECK (role IN ('patient', 'doctor', 'researcher', 'data_scientist'))
+is_active: BOOLEAN NOT NULL DEFAULT TRUE
+created_at: TIMESTAMP DEFAULT NOW()
+updated_at: TIMESTAMP DEFAULT NOW()
+last_login: TIMESTAMP
+```
+
+#### 2. **symptoms**
 ```sql
 id: SERIAL PRIMARY KEY
 name: VARCHAR(100) UNIQUE NOT NULL
@@ -300,7 +392,7 @@ created_at: TIMESTAMP DEFAULT NOW()
 updated_at: TIMESTAMP DEFAULT NOW()
 ```
 
-#### 2. **diseases**
+#### 3. **diseases**
 ```sql
 id: SERIAL PRIMARY KEY
 name: VARCHAR(100) UNIQUE NOT NULL
@@ -312,7 +404,7 @@ created_at: TIMESTAMP DEFAULT NOW()
 updated_at: TIMESTAMP DEFAULT NOW()
 ```
 
-#### 3. **disease_symptoms** (Many-to-Many relationship)
+#### 4. **disease_symptoms** (Many-to-Many relationship)
 ```sql
 id: SERIAL PRIMARY KEY
 disease_id: INTEGER REFERENCES diseases(id)
@@ -321,9 +413,10 @@ weight: FLOAT  -- importance of symptom for disease
 created_at: TIMESTAMP DEFAULT NOW()
 ```
 
-#### 4. **predictions** (Prediction history)
+#### 5. **predictions** (Prediction history)
 ```sql
 id: SERIAL PRIMARY KEY
+user_id: INTEGER REFERENCES users(id) ON DELETE CASCADE
 symptoms: TEXT[]  -- Array of symptom names
 predicted_disease: VARCHAR(100)
 confidence: FLOAT
@@ -340,15 +433,23 @@ session_id: VARCHAR(100)  -- For tracking user sessions
 #### Health Check
 - `GET /health` - Health check endpoint
 
+#### Authentication
+- `POST /auth/login` - User login
+  - Request body: `{"email": "...", "password": "...", "role": "patient|doctor|researcher|data_scientist"}`
+  - Response: `{"access_token": "...", "token_type": "bearer", "user": {...}}`
+- `POST /auth/register` - User registration
+  - Request body: `{"email": "...", "password": "...", "name": "...", "role": "...", "age": ..., "gender": "..."}`
+  - Response: `{"access_token": "...", "token_type": "bearer", "user": {...}}`
+
 #### Symptoms
-- `GET /symptoms` - Get all symptoms
+- `GET /symptoms` - Get all symptoms (paginated)
 - `GET /symptoms/{id}` - Get symptom by ID
 - `POST /symptoms` - Create new symptom (admin)
 - `PUT /symptoms/{id}` - Update symptom (admin)
 - `DELETE /symptoms/{id}` - Delete symptom (admin)
 
 #### Diseases
-- `GET /diseases` - Get all diseases
+- `GET /diseases` - Get all diseases (paginated)
 - `GET /diseases/{id}` - Get disease by ID
 - `GET /diseases/search?name=...` - Search diseases by name
 - `POST /diseases` - Create new disease (admin)
@@ -356,11 +457,11 @@ session_id: VARCHAR(100)  -- For tracking user sessions
 - `DELETE /diseases/{id}` - Delete disease (admin)
 
 #### Prediction
-- `POST /predict` - Predict disease based on symptoms
+- `POST /predict` - Predict disease based on symptoms (requires authentication)
   - Request body: `{"symptoms": ["symptom1", "symptom2", ...]}`
-  - Response: `{"disease": "...", "confidence": 0.95, "alternatives": [...]}`
-- `GET /predictions/history` - Get prediction history (optional)
-- `GET /predictions/{id}` - Get specific prediction
+  - Response: `{"predicted_disease": "...", "confidence": 0.95, "alternatives": [...], "disease_info": {...}}`
+- `GET /predict/history` - Get prediction history for current user (requires authentication)
+- `GET /predict/{id}` - Get specific prediction by ID (requires authentication)
 
 ---
 
@@ -380,10 +481,15 @@ APP_VERSION=1.0.0
 DEBUG=True
 API_V1_PREFIX=/api/v1
 
+# Authentication
+SECRET_KEY=your-secret-key-here-change-in-production
+ALGORITHM=HS256
+ACCESS_TOKEN_EXPIRE_MINUTES=30
+
 # ML Model
-MODEL_PATH=../ml/models/random_forest_model.pkl
-LABEL_ENCODER_PATH=../ml/models/label_encoder.pkl
-FEATURE_NAMES_PATH=../ml/models/feature_names.pkl
+MODEL_PATH=ml/models/random_forest_model.pkl
+LABEL_ENCODER_PATH=ml/models/label_encoder.pkl
+FEATURE_NAMES_PATH=ml/models/feature_names.pkl
 
 # CORS
 CORS_ORIGINS=["http://localhost:4200"]
@@ -423,6 +529,8 @@ numpy>=1.24.0
 joblib>=1.3.0
 kagglehub>=0.2.0
 python-multipart>=0.0.6
+python-jose[cryptography]>=3.3.0
+passlib[bcrypt]>=1.7.4
 ```
 
 ### Frontend (package.json)
@@ -488,43 +596,66 @@ joblib>=1.3.0
 ### 1. Backend Setup (5-10 minutes)
 ```bash
 cd backend
+
+# Install dependencies
 uv sync
+
+# Configure environment variables
+cp .env.example .env
+# Edit .env with your database credentials and SECRET_KEY
+
+# Train ML model
 python ml/scripts/download_data.py
 python ml/scripts/preprocess_data.py
 python ml/scripts/train_model.py
-uv run uvicorn app.main:app --reload
+
+# Run database migrations (if needed)
+# alembic upgrade head
+
+# Start backend server
+uv run uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
 ### 2. Frontend Setup (5 minutes)
 ```bash
 cd frontend
+
+# Install dependencies
 npm install
+
+# Start development server
 ng serve
 ```
 
 ### 3. Test (5 minutes)
-- Open http://localhost:8000/docs - Test API
+- Open http://localhost:8000/docs - Test API (Swagger UI)
 - Open http://localhost:4200 - Test UI
-- Make a prediction through the UI
+- Register a new user account
+- Login and make a prediction through the UI
 
 ---
 
 ## Development Workflow (Simplified)
 
 1. **Backend Setup**
-   - Set up database and models
+   - Set up database and models (including users table)
+   - Implement authentication endpoints
    - Implement API endpoints
    - Train ML model
    - Test basic functionality manually
 
 2. **Frontend Development**
    - Set up Angular project
-   - Create components and services
+   - Implement authentication (login/register)
+   - Create role-based components and services
    - Connect to backend API
-   - Implement basic UI
+   - Implement UI following Figma design
+   - Implement patient home with quick check flow
 
 3. **Integration & Demo**
-   - Test main user flows
+   - Test authentication flow
+   - Test role-based access
+   - Test main user flows (prediction, history)
    - Fix critical bugs
    - Prepare for demonstration
 
@@ -551,10 +682,14 @@ ng serve
 
 ### What to Verify
 1. ✅ ML model trains successfully
-2. ✅ API endpoints return correct data
-3. ✅ Frontend displays data properly
-4. ✅ Prediction flow works from UI to API to ML
-5. ✅ Database stores predictions
+2. ✅ Authentication works (login/register)
+3. ✅ Role-based access control works
+4. ✅ API endpoints return correct data
+5. ✅ Frontend displays data properly
+6. ✅ Prediction flow works from UI to API to ML
+7. ✅ Database stores users and predictions
+8. ✅ Patient home quick check functionality works
+9. ✅ Role-specific dashboards display correctly
 
 ---
 
@@ -565,6 +700,7 @@ For your school presentation, demonstrate:
 1. **System Architecture** (2 min)
    - Show the project structure
    - Explain Backend → ML → Database → Frontend flow
+   - Show authentication flow
 
 2. **Machine Learning** (3 min)
    - Show training scripts
@@ -573,17 +709,21 @@ For your school presentation, demonstrate:
 
 3. **Backend API** (2 min)
    - Show Swagger documentation
+   - Demonstrate authentication (login/register)
    - Test a prediction endpoint
    - Show response with confidence scores
 
 4. **Frontend UI** (3 min)
-   - Navigate through the application
-   - Select symptoms
-   - Show prediction results
+   - Show login/register pages
+   - Navigate through role-based dashboards
+   - Demonstrate patient home with quick check
+   - Select symptoms and show prediction results
    - Show disease information
+   - Demonstrate different user roles (patient, doctor, researcher, data scientist)
 
 5. **Database** (1 min)
-   - Show stored predictions (optional)
+   - Show stored users and predictions
+   - Show role-based access
 
 ---
 
@@ -666,24 +806,27 @@ Based on typical school project criteria:
 
 - Extensive unit tests
 - Production deployment
-- Advanced security features
+- Advanced security features beyond basic JWT auth
 - Performance optimization
 - Responsive design for mobile
 - Advanced animations
-- User authentication
-- Multiple user roles
-- Complex state management
+- Complex state management (NgRx)
+- Email verification
+- Password reset functionality
 
 ---
 
 ## ✨ Optional Enhancements (If You Have Time)
 
 Priority order:
-1. Better UI styling (Bootstrap/Material)
-2. Prediction history display
-3. Search functionality for symptoms
-4. Better error messages
-5. Loading indicators
+1. Better UI styling (Bootstrap/Material) - Match Figma design
+2. Enhanced prediction history with filtering
+3. Advanced search functionality for symptoms
+4. Better error messages and user feedback
+5. Loading indicators and progress bars
+6. Email notifications
+7. Password reset functionality
+8. Profile picture upload
 
 ---
 
@@ -700,10 +843,13 @@ Priority order:
 
 ## Security Best Practices
 
-- Use environment variables for sensitive data
+- Use environment variables for sensitive data (SECRET_KEY, database credentials)
 - Implement input validation (Pydantic)
 - SQL injection prevention (SQLAlchemy ORM)
+- Password hashing (bcrypt via passlib)
+- JWT token-based authentication
 - CORS configuration
+- Role-based access control (RBAC)
 - Rate limiting for API endpoints (optional)
 - HTTPS in production
 

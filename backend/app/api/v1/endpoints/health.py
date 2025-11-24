@@ -1,4 +1,5 @@
 """Health check endpoint"""
+import traceback
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from loguru import logger
@@ -26,7 +27,8 @@ def health_check(db: Session = Depends(get_db)):
         db.execute("SELECT 1")
         db_status = "connected"
     except Exception as e:
-        logger.error(f"Database connection error: {e}")
+        traceback_str = traceback.format_exc()
+        logger.error(f"Database connection error: {e}\n{traceback_str}")
         db_status = "disconnected"
     
     # Check ML model

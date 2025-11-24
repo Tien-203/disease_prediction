@@ -1,7 +1,9 @@
 """Disease endpoints"""
+import traceback
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.orm import Session
 from typing import Optional
+from loguru import logger
 
 from app.api.deps import get_db
 from app.schemas.disease import (
@@ -28,10 +30,20 @@ def get_diseases(
         skip: Number of records to skip
         limit: Maximum number of records to return
     """
-    service = DiseaseService(db)
-    diseases, total = service.get_all_diseases(skip=skip, limit=limit)
-    
-    return DiseaseListResponse(diseases=diseases, total=total)
+    try:
+        service = DiseaseService(db)
+        diseases, total = service.get_all_diseases(skip=skip, limit=limit)
+        
+        return DiseaseListResponse(diseases=diseases, total=total)
+    except HTTPException:
+        raise
+    except Exception as e:
+        traceback_str = traceback.format_exc()
+        logger.error(f"Error getting diseases: {str(e)}\n{traceback_str}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error getting diseases: {str(e)}"
+        )
 
 
 @router.get("/search", response_model=DiseaseListResponse)
@@ -45,10 +57,20 @@ def search_diseases(
     Args:
         name: Disease name to search for
     """
-    service = DiseaseService(db)
-    diseases = service.search_diseases(name)
-    
-    return DiseaseListResponse(diseases=diseases, total=len(diseases))
+    try:
+        service = DiseaseService(db)
+        diseases = service.search_diseases(name)
+        
+        return DiseaseListResponse(diseases=diseases, total=len(diseases))
+    except HTTPException:
+        raise
+    except Exception as e:
+        traceback_str = traceback.format_exc()
+        logger.error(f"Error searching diseases with name '{name}': {str(e)}\n{traceback_str}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error searching diseases: {str(e)}"
+        )
 
 
 @router.get("/{disease_id}", response_model=DiseaseResponse)
@@ -62,16 +84,26 @@ def get_disease(
     Args:
         disease_id: Disease ID
     """
-    service = DiseaseService(db)
-    disease = service.get_disease_by_id(disease_id)
-    
-    if not disease:
+    try:
+        service = DiseaseService(db)
+        disease = service.get_disease_by_id(disease_id)
+        
+        if not disease:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Disease with ID {disease_id} not found"
+            )
+        
+        return disease
+    except HTTPException:
+        raise
+    except Exception as e:
+        traceback_str = traceback.format_exc()
+        logger.error(f"Error getting disease by ID {disease_id}: {str(e)}\n{traceback_str}")
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Disease with ID {disease_id} not found"
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error getting disease: {str(e)}"
         )
-    
-    return disease
 
 
 @router.post("", response_model=DiseaseResponse, status_code=status.HTTP_201_CREATED)
@@ -90,7 +122,11 @@ def create_disease(
     try:
         disease = service.create_disease(disease_data)
         return disease
+    except HTTPException:
+        raise
     except Exception as e:
+        traceback_str = traceback.format_exc()
+        logger.error(f"Error creating disease: {str(e)}\n{traceback_str}")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Error creating disease: {str(e)}"
@@ -110,16 +146,26 @@ def update_disease(
         disease_id: Disease ID
         disease_data: Disease update data
     """
-    service = DiseaseService(db)
-    disease = service.update_disease(disease_id, disease_data)
-    
-    if not disease:
+    try:
+        service = DiseaseService(db)
+        disease = service.update_disease(disease_id, disease_data)
+        
+        if not disease:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Disease with ID {disease_id} not found"
+            )
+        
+        return disease
+    except HTTPException:
+        raise
+    except Exception as e:
+        traceback_str = traceback.format_exc()
+        logger.error(f"Error updating disease ID {disease_id}: {str(e)}\n{traceback_str}")
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Disease with ID {disease_id} not found"
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error updating disease: {str(e)}"
         )
-    
-    return disease
 
 
 @router.delete("/{disease_id}", status_code=status.HTTP_204_NO_CONTENT)
@@ -133,12 +179,22 @@ def delete_disease(
     Args:
         disease_id: Disease ID
     """
-    service = DiseaseService(db)
-    success = service.delete_disease(disease_id)
-    
-    if not success:
+    try:
+        service = DiseaseService(db)
+        success = service.delete_disease(disease_id)
+        
+        if not success:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Disease with ID {disease_id} not found"
+            )
+    except HTTPException:
+        raise
+    except Exception as e:
+        traceback_str = traceback.format_exc()
+        logger.error(f"Error deleting disease ID {disease_id}: {str(e)}\n{traceback_str}")
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Disease with ID {disease_id} not found"
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error deleting disease: {str(e)}"
         )
 

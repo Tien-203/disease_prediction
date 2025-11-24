@@ -24,7 +24,8 @@ class PredictionService:
     
     def predict_disease(
         self,
-        request: PredictionRequest
+        request: PredictionRequest,
+        user_id: Optional[int] = None
     ) -> PredictionResponse:
         """
         Predict disease based on symptoms
@@ -35,8 +36,12 @@ class PredictionService:
         Returns:
             PredictionResponse with prediction results
         """
-        # Make prediction
-        predicted_disease, confidence, alternatives = self.predictor.predict(request.symptoms)
+        # Remove duplicates from symptoms list and normalize
+        unique_symptoms = list(dict.fromkeys(request.symptoms))  # Preserves order while removing duplicates
+        logger.info(f"Received {len(request.symptoms)} symptoms, {len(unique_symptoms)} unique")
+        
+        # Make prediction with unique symptoms
+        predicted_disease, confidence, alternatives = self.predictor.predict(unique_symptoms)
         
         # Get disease information from database
         disease_info = None
@@ -52,9 +57,10 @@ class PredictionService:
                 "recommendations": disease_record.recommendations
             }
         
-        # Save prediction to database
+        # Save prediction to database (use unique symptoms)
         prediction_record = Prediction(
-            symptoms=request.symptoms,
+            user_id=user_id,  # Can be None for anonymous predictions
+            symptoms=unique_symptoms,  # Use unique symptoms
             predicted_disease=predicted_disease,
             confidence=confidence,
             session_id=request.session_id
@@ -74,7 +80,7 @@ class PredictionService:
             predicted_disease=predicted_disease,
             confidence=confidence,
             alternatives=alternative_predictions,
-            symptoms_used=request.symptoms,
+            symptoms_used=unique_symptoms,  # Return unique symptoms
             disease_info=disease_info
         )
     

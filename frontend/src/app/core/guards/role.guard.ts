@@ -50,3 +50,9 @@ export const patientGuard = roleGuard(['patient']);
 export const doctorGuard = roleGuard(['doctor']);
 export const dataScientistGuard = roleGuard(['data scientist', 'datascientist']);
 export const researcherGuard = roleGuard(['researcher']);
+
+
+
+
+
+

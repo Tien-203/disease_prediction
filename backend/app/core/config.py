@@ -23,6 +23,7 @@ class Settings(BaseSettings):
     MODEL_PATH: str = Field(default="ml/models/random_forest_model.pkl", description="ML model path")
     LABEL_ENCODER_PATH: str = Field(default="ml/models/label_encoder.pkl", description="Label encoder path")
     FEATURE_NAMES_PATH: str = Field(default="ml/models/feature_names.pkl", description="Feature names path")
+    GROUP_ENCODERS_PATH: str = Field(default="ml/models/group_encoders.pkl", description="Group encoders path (optional, for group-based models)")
     
     # CORS
     CORS_ORIGINS: List[str] = Field(

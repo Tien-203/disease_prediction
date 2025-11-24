@@ -13,13 +13,15 @@ class ModelLoader:
         self.model: Optional[Any] = None
         self.label_encoder: Optional[Any] = None
         self.feature_names: Optional[list] = None
+        self.group_encoders: Optional[dict] = None
         self._is_loaded = False
     
     def load_models(
         self,
         model_path: str,
         label_encoder_path: str,
-        feature_names_path: str
+        feature_names_path: str,
+        group_encoders_path: Optional[str] = None
     ) -> bool:
         """
         Load ML models from disk
@@ -28,6 +30,7 @@ class ModelLoader:
             model_path: Path to the trained model file
             label_encoder_path: Path to the label encoder file
             feature_names_path: Path to the feature names file
+            group_encoders_path: Optional path to group encoders file (for group-based models)
             
         Returns:
             bool: True if models loaded successfully, False otherwise
@@ -62,6 +65,19 @@ class ModelLoader:
             logger.info(f"Loading feature names from {feature_names_path}")
             self.feature_names = joblib.load(feature_names_path)
             
+            # Load group encoders if provided (for group-based models)
+            if group_encoders_path:
+                group_encoders_path = base_path / group_encoders_path
+                if group_encoders_path.exists():
+                    logger.info(f"Loading group encoders from {group_encoders_path}")
+                    self.group_encoders = joblib.load(group_encoders_path)
+                    logger.info("Group encoders loaded successfully")
+                else:
+                    logger.warning(f"Group encoders file not found: {group_encoders_path}")
+                    self.group_encoders = None
+            else:
+                self.group_encoders = None
+            
             self._is_loaded = True
             logger.info("All models loaded successfully")
             return True
@@ -92,6 +108,12 @@ class ModelLoader:
         if not self._is_loaded:
             raise RuntimeError("Models not loaded. Call load_models() first.")
         return self.feature_names
+    
+    def get_group_encoders(self):
+        """Get the group encoders (for group-based models)"""
+        if not self._is_loaded:
+            raise RuntimeError("Models not loaded. Call load_models() first.")
+        return self.group_encoders
 
 
 # Global model loader instance

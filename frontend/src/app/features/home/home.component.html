@@ -6,202 +6,229 @@
     </div>
 
     <div class="patient-home__actions">
-      <button type="button" class="cta cta--primary" (click)="startQuickCheck()">
+      <button class="action-button" (click)="openQuickCheckModal()">
         Start a Quick Check by answer questions
       </button>
-      <span class="patient-home__separator">or</span>
-      <button type="button" class="cta cta--secondary" (click)="openDescribeModal()">
+      <span class="or-separator">or</span>
+      <button class="action-button" (click)="openDescribeModal()">
         Describe your symptoms
       </button>
     </div>
   </section>
+
+  <section class="patient-home__improve">
+    <h2 class="improve-heading">You can help us to improve by</h2>
+    <button class="action-button action-button--improve" (click)="navigateToRecordDisease()">
+      Record new diseases
+    </button>
+  </section>
 </div>
 
-<div class="modal-overlay" *ngIf="quickCheckVisible">
-  <div class="modal">
-    <button class="modal__close" type="button" (click)="closeQuickCheck()" aria-label="Close quick check">
-      &times;
-    </button>
+<!-- Quick Check Modal -->
+<div class="modal-overlay" *ngIf="showQuickCheckModal" (click)="closeQuickCheckModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <button class="modal-close" (click)="closeQuickCheckModal()">×</button>
+    
+    <div class="modal-header">
+      <h2 class="modal-title">Quick Check</h2>
+      <div class="progress-bar">
+        <div class="progress-fill" [style.width.%]="getProgress()"></div>
+      </div>
+      <p class="progress-text">Question {{ currentGroupIndex + 1 }} of {{ symptomGroups.length }}</p>
+    </div>
 
-    <div class="modal__progress">
-      <div
-        *ngFor="let label of stepLabels; index as idx"
-        class="progress-step"
-        [class.progress-step--active]="quickCheckStep === idx + 1"
-        [class.progress-step--done]="idx + 1 < quickCheckStep"
-      >
-        <span>{{ label }}</span>
+    <div class="modal-body" *ngIf="!isLoadingGroups && !isProcessing">
+      <div *ngIf="getCurrentGroup()" class="question-container">
+        <h3 class="question-text">{{ getCurrentGroup()!.question }}</h3>
+        
+        <div class="symptom-options">
+          <button
+            *ngFor="let option of getCurrentGroup()!.options"
+            class="symptom-option"
+            [class.symptom-option--selected]="isSymptomSelected(option.id)"
+            [class.symptom-option--single]="!getCurrentGroup()!.allow_multiple"
+            (click)="toggleSymptom(option.id)">
+            {{ option.display_name }}
+          </button>
+        </div>
       </div>
     </div>
 
-    <div class="modal__body">
-      <!-- Step 1 -->
-      <ng-container *ngIf="quickCheckStep === 1">
-        <h2 class="modal-title">What symptoms are you experiencing?</h2>
-        <p class="modal-caption">Search for your symptoms and add them to your check.</p>
-
-        <div class="symptom-search">
-          <div class="symptom-search__input">
-            <input
-              type="text"
-              placeholder="Search for your symptoms"
-              [(ngModel)]="symptomSearch"
-              (keydown)="handleSymptomEnter($event)"
-              [disabled]="symptomsLoading"
-            />
-            <button type="button" (click)="addSymptom(symptomSearch)" [disabled]="!symptomSearch.trim()">
-              Add
-            </button>
-          </div>
-
-          <div class="symptom-search__suggestions" *ngIf="filteredSymptoms.length > 0">
-            <button
-              type="button"
-              class="suggestion"
-              *ngFor="let symptom of filteredSymptoms"
-              (click)="addSymptom(symptom.name)"
-            >
-              {{ symptom.name }}
-            </button>
-          </div>
-        </div>
-
-        <div class="selected-symptoms" *ngIf="selectedSymptoms.length > 0">
-          <span class="selected-symptoms__label">Selected symptoms</span>
-          <div class="chip-group">
-            <span class="chip" *ngFor="let item of selectedSymptoms">
-              {{ item }}
-              <button type="button" class="chip__remove" (click)="removeSymptom(item)" aria-label="Remove symptom">
-                &times;
-              </button>
-            </span>
-          </div>
-        </div>
-
-        <div *ngIf="quickCheckError" class="modal-error" role="alert">
-          {{ quickCheckError }}
-        </div>
-
-        <div class="modal__footer">
-          <button type="button" class="cta cta--primary" (click)="goToQuestions()" [disabled]="selectedSymptoms.length === 0">
-            Continue
-          </button>
-        </div>
-      </ng-container>
-
-      <!-- Step 2 -->
-      <ng-container *ngIf="quickCheckStep === 2">
-        <h2 class="modal-title">Tell us a little more</h2>
-        <p class="modal-caption">Answer these quick questions to personalise your insights.</p>
-
-        <div class="question-list">
-          <label class="question" *ngFor="let question of questionPrompts; index as idx">
-            <span>{{ question }}</span>
-            <input
-              type="text"
-              placeholder="Question answer"
-              [(ngModel)]="questionAnswers[idx]"
-            />
-          </label>
-        </div>
-
-        <div class="modal__footer">
-          <button type="button" class="cta cta--secondary" (click)="quickCheckStep = 1">
-            Back
-          </button>
-          <button type="button" class="cta cta--primary" (click)="submitQuickCheck()">
-            Continue
-          </button>
-        </div>
-      </ng-container>
-
-      <!-- Step 3 -->
-      <ng-container *ngIf="quickCheckStep === 3">
-        <div class="checking">
-          <div class="checking__indicator">
-            <div class="ring"></div>
-            <div class="ring ring--inner"></div>
-          </div>
-          <p>Checking your symptoms</p>
-        </div>
-      </ng-container>
-
-      <!-- Step 4 -->
-      <ng-container *ngIf="quickCheckStep === 4">
-        <h2 class="modal-title">Here are your possible conditions</h2>
-
-        <div class="prediction-results" *ngIf="predictionResult; else noResult">
-          <div class="prediction-results__item">
-            <span class="prediction-results__disease">{{ predictionResult.predicted_disease }}</span>
-            <span class="prediction-results__confidence">
-              {{ getConfidencePercentage(predictionResult.confidence) }}%
-            </span>
-          </div>
-
-          <div class="prediction-results__item" *ngFor="let alt of predictionResult.alternatives">
-            <span class="prediction-results__disease">{{ alt.disease }}</span>
-            <span class="prediction-results__confidence">
-              {{ getConfidencePercentage(alt.confidence) }}%
-            </span>
-          </div>
-        </div>
-
-        <ng-template #noResult>
-          <div class="modal-error">
-            We could not determine a condition. Please try again later.
-          </div>
-        </ng-template>
-
-        <div class="recommendations" *ngIf="predictionResult as result">
-          <h3>Our Recommendations</h3>
-          <ng-container *ngIf="getRecommendationList(result.disease_info) as recommendationList">
-            <ul>
-              <li *ngFor="let tip of recommendationList">
-                {{ tip }}
-              </li>
-              <li *ngIf="recommendationList.length === 0">
-                Stay hydrated, rest well, and consult a doctor if symptoms persist.
-              </li>
-            </ul>
-          </ng-container>
-        </div>
-
-        <div class="modal__footer modal__footer--center">
-          <button type="button" class="cta cta--primary" (click)="closeQuickCheck()">
-            Close
-          </button>
-        </div>
-      </ng-container>
-    </div>
-  </div>
-</div>
-
-<div class="modal-overlay" *ngIf="describeModalOpen">
-  <div class="modal modal--compact">
-    <button class="modal__close" type="button" (click)="closeDescribeModal()" aria-label="Close description modal">
-      &times;
-    </button>
-
-    <div class="modal__body">
-      <h2 class="modal-title">How are you feeling right now?</h2>
-      <p class="modal-caption">Describe your feeling. Separate multiple symptoms with commas.</p>
-
-      <textarea
-        rows="6"
-        placeholder="Describe your feeling"
-        [(ngModel)]="describeText"
-      ></textarea>
-
-      <div *ngIf="describeError" class="modal-error" role="alert">
-        {{ describeError }}
+    <div class="modal-body" *ngIf="isLoadingGroups">
+      <div class="loading-container">
+        <p>Loading questions...</p>
       </div>
+    </div>
 
-      <div class="modal__footer modal__footer--end">
-        <button type="button" class="cta cta--primary" (click)="submitFeelingDescription()">
-          Continue
+    <div class="modal-body" *ngIf="isProcessing">
+      <div class="loading-container">
+        <p>Processing your symptoms...</p>
+      </div>
+    </div>
+
+    <div class="modal-footer" *ngIf="!isLoadingGroups && !isProcessing">
+      <button 
+        class="modal-button modal-button--secondary" 
+        (click)="previousQuestion()"
+        [disabled]="currentGroupIndex === 0">
+        Previous
+      </button>
+      <div class="modal-footer__right">
+        <button 
+          class="modal-button modal-button--skip" 
+          (click)="skipQuestion()">
+          Skip
+        </button>
+        <button 
+          class="modal-button modal-button--primary" 
+          (click)="nextQuestion()"
+          [disabled]="!canProceed()">
+          {{ currentGroupIndex === symptomGroups.length - 1 ? 'Submit' : 'Next' }}
         </button>
       </div>
     </div>
   </div>
 </div>
+
+<!-- Describe Symptoms Modal -->
+<div class="modal-overlay" *ngIf="showDescribeModal" (click)="closeDescribeModal()">
+  <div class="modal-content modal-content--describe" (click)="$event.stopPropagation()">
+    <button class="modal-close" (click)="closeDescribeModal()">×</button>
+    
+    <div class="modal-header">
+      <h2 class="modal-title">How are you feeling right now?</h2>
+    </div>
+
+    <div class="modal-body">
+      <textarea
+        class="description-input"
+        [(ngModel)]="symptomDescription"
+        placeholder="Describe your feeling"
+        rows="6">
+      </textarea>
+    </div>
+
+    <div class="modal-footer modal-footer--right">
+      <button 
+        class="modal-button modal-button--primary" 
+        (click)="submitDescription()"
+        [disabled]="!symptomDescription.trim()">
+        Continue
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Confirm Submit Modal -->
+<div class="modal-overlay" *ngIf="showConfirmSubmitModal" (click)="cancelConfirmSubmit()">
+  <div class="modal-content modal-content--confirm" (click)="$event.stopPropagation()">
+    <button class="modal-close" (click)="cancelConfirmSubmit()">×</button>
+    
+    <div class="modal-header">
+      <h2 class="modal-title">Confirm Submission</h2>
+    </div>
+
+    <div class="modal-body">
+      <p class="confirm-message">
+        Are you sure you want to submit your symptoms for prediction?
+        <span *ngIf="pendingSubmitAction === 'skip'"> You are skipping the last question.</span>
+      </p>
+      <p class="confirm-submessage" *ngIf="getSelectedSymptomsCount() > 0">
+        You have selected {{ getSelectedSymptomsCount() }} symptom(s).
+      </p>
+    </div>
+
+    <div class="modal-footer">
+      <button 
+        class="modal-button modal-button--secondary" 
+        (click)="cancelConfirmSubmit()">
+        Cancel
+      </button>
+      <button 
+        class="modal-button modal-button--primary" 
+        (click)="confirmSubmit()">
+        Confirm & Submit
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Results Modal -->
+<div class="modal-overlay" *ngIf="showResultsModal" (click)="closeResultsModal()">
+  <div class="modal-content modal-content--results" (click)="$event.stopPropagation()">
+    <button class="modal-close" (click)="closeResultsModal()">×</button>
+    
+    <!-- Progress Indicator -->
+    <div class="results-progress">
+      <div class="progress-step completed">
+        <div class="step-circle">
+          <span class="step-check">✓</span>
+        </div>
+      </div>
+      <div class="progress-line completed"></div>
+      <div class="progress-step completed">
+        <div class="step-circle">
+          <span class="step-check">✓</span>
+        </div>
+      </div>
+      <div class="progress-line completed"></div>
+      <div class="progress-step completed">
+        <div class="step-circle">
+          <span class="step-check">✓</span>
+        </div>
+      </div>
+      <div class="progress-line completed"></div>
+      <div class="progress-step completed">
+        <div class="step-circle">
+          <span class="step-check">✓</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Loading State (shown during processing) -->
+    <div class="results-loading" *ngIf="isProcessing">
+      <div class="loading-spinner"></div>
+      <p class="loading-text">Checking your symptoms</p>
+    </div>
+
+    <!-- Results Content -->
+    <div class="results-content" #resultsContent *ngIf="!isProcessing && predictionResult">
+      <!-- Possible Conditions -->
+      <div class="results-section">
+        <h2 class="results-section-title">Here is your Possible Conditions</h2>
+        <div class="disease-list">
+          <div 
+            *ngFor="let pred of allPredictions" 
+            class="disease-item">
+            <div class="disease-name">{{ pred.disease }}</div>
+            <div class="disease-separator">|</div>
+            <div class="disease-confidence">{{ (pred.confidence * 100).toFixed(0) }}%</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recommendations -->
+      <div class="results-section">
+        <h2 class="results-section-title">Our Recommendations</h2>
+        <ul class="recommendations-list">
+          <li *ngFor="let rec of getRecommendations()" class="recommendation-item">
+            {{ rec }}
+          </li>
+        </ul>
+      </div>
+
+      <!-- Not Satisfied Section -->
+      <div class="results-section">
+        <h2 class="results-section-title">Not satisfied with the result?</h2>
+        <button 
+          class="action-button action-button--results" 
+          (click)="navigateToRecordDiseaseFromResults()">
+          Record new diseases
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
 

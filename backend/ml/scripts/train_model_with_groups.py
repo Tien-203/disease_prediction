@@ -1,11 +1,12 @@
-"""Train Random Forest model for disease prediction"""
+"""Train Random Forest model for disease prediction using symptom groups"""
 import pandas as pd
 import numpy as np
 import joblib
 from pathlib import Path
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.preprocessing import LabelEncoder
+from sklearn.preprocessing import LabelEncoder, OrdinalEncoder
+from collections import defaultdict
 from sklearn.metrics import (
     accuracy_score,
     precision_score,
@@ -19,15 +20,15 @@ import sys
 import json
 
 
-def train_disease_prediction_model(data_file: str, models_dir: str):
+def train_disease_prediction_model_with_groups(data_file: str, models_dir: str):
     """
-    Train Random Forest classifier for disease prediction
+    Train Random Forest classifier for disease prediction using symptom groups
     
     Args:
-        data_file: Path to processed dataset CSV file
+        data_file: Path to processed dataset CSV file (with groups)
         models_dir: Directory to save trained models
     """
-    logger.info("Starting model training...")
+    logger.info("Starting model training with symptom groups...")
     
     # Load data
     logger.info(f"Loading data from {data_file}...")
@@ -56,9 +57,27 @@ def train_disease_prediction_model(data_file: str, models_dir: str):
     X = df.drop(columns=[target_col])
     y = df[target_col]
     
-    # Get feature names
+    # Get feature names (should be the 13 groups)
     feature_names = X.columns.tolist()
-    logger.info(f"Number of features: {len(feature_names)}")
+    logger.info(f"Number of group features: {len(feature_names)}")
+    logger.info(f"Group features: {feature_names}")
+    
+    # Encode categorical group features (symptom names) to numerical values
+    logger.info("Encoding categorical group features...")
+    group_encoders = {}
+    X_encoded = X.copy()
+    
+    # Replace empty strings with a special value for encoding
+    X_encoded = X_encoded.replace('', 'NO_SYMPTOM')
+    
+    # Encode each group column
+    for col in feature_names:
+        logger.info(f"Encoding group '{col}'...")
+        encoder = LabelEncoder()
+        # Fit and transform the column
+        X_encoded[col] = encoder.fit_transform(X_encoded[col].astype(str))
+        group_encoders[col] = encoder
+        logger.info(f"  Found {len(encoder.classes_)} unique symptom combinations in group '{col}'")
     
     # Encode target labels
     logger.info("Encoding disease labels...")
@@ -71,7 +90,7 @@ def train_disease_prediction_model(data_file: str, models_dir: str):
     # Split data
     logger.info("Splitting data into train and test sets...")
     X_train, X_test, y_train, y_test = train_test_split(
-        X, y_encoded,
+        X_encoded, y_encoded,
         test_size=0.2,
         random_state=42,
         stratify=y_encoded
@@ -121,8 +140,8 @@ def train_disease_prediction_model(data_file: str, models_dir: str):
         'importance': rf_model.feature_importances_
     }).sort_values('importance', ascending=False)
     
-    logger.info("\nTop 10 most important features:")
-    print(feature_importance.head(10))
+    logger.info("\nGroup feature importance:")
+    print(feature_importance)
     
     # Save models
     models_path = Path(models_dir)
@@ -131,20 +150,24 @@ def train_disease_prediction_model(data_file: str, models_dir: str):
     model_file = models_path / "random_forest_model.pkl"
     encoder_file = models_path / "label_encoder.pkl"
     features_file = models_path / "feature_names.pkl"
+    group_encoders_file = models_path / "group_encoders.pkl"
     metadata_file = models_path / "model_metadata.json"
     
     logger.info("\nSaving models...")
     joblib.dump(rf_model, model_file)
     joblib.dump(label_encoder, encoder_file)
     joblib.dump(feature_names, features_file)
+    joblib.dump(group_encoders, group_encoders_file)
     
     logger.info(f"Model saved to {model_file}")
     logger.info(f"Label encoder saved to {encoder_file}")
     logger.info(f"Feature names saved to {features_file}")
+    logger.info(f"Group encoders saved to {group_encoders_file}")
     
     # Save metadata
     metadata = {
         "model_type": "RandomForestClassifier",
+        "model_version": "group_based",
         "n_estimators": 100,
         "train_accuracy": float(train_accuracy),
         "test_accuracy": float(test_accuracy),
@@ -155,7 +178,7 @@ def train_disease_prediction_model(data_file: str, models_dir: str):
         "n_classes": len(label_encoder.classes_),
         "classes": label_encoder.classes_.tolist(),
         "feature_names": feature_names,
-        "top_10_features": feature_importance.head(10).to_dict('records')
+        "feature_importance": feature_importance.to_dict('records')
     }
     
     with open(metadata_file, 'w') as f:
@@ -166,6 +189,7 @@ def train_disease_prediction_model(data_file: str, models_dir: str):
     logger.success("\n✓ Model training completed successfully!")
     logger.info(f"\nModel files location: {models_path}")
     logger.info("You can now start the FastAPI backend to use the trained model.")
+    logger.info("\nNote: This model uses symptom groups instead of individual symptoms.")
 
 
 if __name__ == "__main__":
@@ -180,14 +204,16 @@ if __name__ == "__main__":
     
     # Paths
     base_dir = Path(__file__).parent.parent
-    processed_data_file = base_dir / "data" / "processed" / "processed_dataset.csv"
+    processed_data_file = base_dir / "data" / "processed" / "processed_dataset_with_groups.csv"
     models_dir = base_dir / "models"
     
     # Check if processed data exists
     if not processed_data_file.exists():
         logger.error(f"Processed data not found: {processed_data_file}")
-        logger.info("Please run preprocess_data.py first")
+        logger.info("Please run preprocess_data_with_groups.py first")
         sys.exit(1)
     
     # Train model
-    train_disease_prediction_model(str(processed_data_file), str(models_dir))
+    train_disease_prediction_model_with_groups(str(processed_data_file), str(models_dir))
+
+

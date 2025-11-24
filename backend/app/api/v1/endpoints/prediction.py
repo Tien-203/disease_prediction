@@ -1,9 +1,11 @@
 """Prediction endpoints"""
+import traceback
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import Optional
+from loguru import logger
 
-from app.api.deps import get_db
+from app.api.deps import get_db, get_current_user_optional
 from app.schemas.prediction import (
     PredictionRequest,
     PredictionResponse,
@@ -12,6 +14,7 @@ from app.schemas.prediction import (
 )
 from app.services.prediction_service import PredictionService
 from app.ml.model_loader import model_loader
+from app.models.user import User
 
 router = APIRouter()
 
@@ -19,7 +22,8 @@ router = APIRouter()
 @router.post("", response_model=PredictionResponse)
 def predict_disease(
     request: PredictionRequest,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User | None = Depends(get_current_user_optional)
 ):
     """
     Predict disease based on symptoms
@@ -46,9 +50,15 @@ def predict_disease(
     
     try:
         service = PredictionService(db)
-        prediction = service.predict_disease(request)
+        # Get user_id if user is authenticated, otherwise None
+        user_id = current_user.id if current_user else None
+        prediction = service.predict_disease(request, user_id=user_id)
         return prediction
+    except HTTPException:
+        raise
     except Exception as e:
+        traceback_str = traceback.format_exc()
+        logger.error(f"Error making prediction: {str(e)}\n{traceback_str}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error making prediction: {str(e)}"
@@ -70,17 +80,27 @@ def get_prediction_history(
         limit: Maximum number of records to return
         session_id: Optional session ID filter
     """
-    service = PredictionService(db)
-    predictions = service.get_prediction_history(
-        skip=skip,
-        limit=limit,
-        session_id=session_id
-    )
-    
-    return PredictionHistoryListResponse(
-        predictions=predictions,
-        total=len(predictions)
-    )
+    try:
+        service = PredictionService(db)
+        predictions = service.get_prediction_history(
+            skip=skip,
+            limit=limit,
+            session_id=session_id
+        )
+        
+        return PredictionHistoryListResponse(
+            predictions=predictions,
+            total=len(predictions)
+        )
+    except HTTPException:
+        raise
+    except Exception as e:
+        traceback_str = traceback.format_exc()
+        logger.error(f"Error getting prediction history: {str(e)}\n{traceback_str}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error getting prediction history: {str(e)}"
+        )
 
 
 @router.get("/{prediction_id}", response_model=PredictionHistoryResponse)
@@ -94,14 +114,24 @@ def get_prediction(
     Args:
         prediction_id: Prediction ID
     """
-    service = PredictionService(db)
-    prediction = service.get_prediction_by_id(prediction_id)
-    
-    if not prediction:
+    try:
+        service = PredictionService(db)
+        prediction = service.get_prediction_by_id(prediction_id)
+        
+        if not prediction:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Prediction with ID {prediction_id} not found"
+            )
+        
+        return prediction
+    except HTTPException:
+        raise
+    except Exception as e:
+        traceback_str = traceback.format_exc()
+        logger.error(f"Error getting prediction by ID {prediction_id}: {str(e)}\n{traceback_str}")
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Prediction with ID {prediction_id} not found"
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error getting prediction: {str(e)}"
         )
-    
-    return prediction
 

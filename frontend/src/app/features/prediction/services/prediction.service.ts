@@ -6,7 +6,7 @@ import {
   PredictionResponse,
   PredictionHistory
 } from '../models/prediction.model';
-import { SymptomListResponse } from '../models/symptom.model';
+import { SymptomListResponse, SymptomGroupsResponse } from '../models/symptom.model';
 
 /**
  * Prediction Service
@@ -23,6 +23,13 @@ export class PredictionService {
    */
   getSymptoms(skip: number = 0, limit: number = 100): Observable<SymptomListResponse> {
     return this.apiService.get<SymptomListResponse>('/symptoms', { skip, limit });
+  }
+
+  /**
+   * Get grouped symptoms for quick check questions
+   */
+  getGroupedSymptoms(): Observable<SymptomGroupsResponse> {
+    return this.apiService.get<SymptomGroupsResponse>('/symptoms/groups');
   }
 
   /**

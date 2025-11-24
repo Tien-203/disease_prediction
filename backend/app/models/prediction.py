@@ -11,7 +11,7 @@ class Prediction(Base):
     __tablename__ = "predictions"
     
     id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=True, index=True)  # Optional for anonymous predictions
     symptoms = Column(ARRAY(Text), nullable=False)  # Array of symptom names
     predicted_disease = Column(String(100), nullable=False)
     confidence = Column(Float, nullable=False)

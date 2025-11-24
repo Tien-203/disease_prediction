@@ -1,12 +1,13 @@
 {
   "model_type": "RandomForestClassifier",
+  "model_version": "group_based",
   "n_estimators": 100,
   "train_accuracy": 1.0,
   "test_accuracy": 1.0,
   "precision": 1.0,
   "recall": 1.0,
   "f1_score": 1.0,
-  "n_features": 131,
+  "n_features": 13,
   "n_classes": 41,
   "classes": [
     "(vertigo) Paroymsal  Positional Vertigo",
@@ -52,178 +53,72 @@
     "hepatitis A"
   ],
   "feature_names": [
-    "abdominal_pain",
-    "abnormal_menstruation",
-    "acidity",
-    "acute_liver_failure",
-    "altered_sensorium",
-    "anxiety",
-    "back_pain",
-    "belly_pain",
-    "blackheads",
-    "bladder_discomfort",
-    "blister",
-    "blood_in_sputum",
-    "bloody_stool",
-    "blurred_and_distorted_vision",
-    "breathlessness",
-    "brittle_nails",
-    "bruising",
-    "burning_micturition",
-    "chest_pain",
-    "chills",
-    "cold_hands_and_feets",
-    "coma",
-    "congestion",
-    "constipation",
-    "continuous_feel_of_urine",
-    "continuous_sneezing",
-    "cough",
-    "cramps",
-    "dark_urine",
-    "dehydration",
-    "depression",
-    "diarrhoea",
-    "dischromic _patches",
-    "distention_of_abdomen",
-    "dizziness",
-    "drying_and_tingling_lips",
-    "enlarged_thyroid",
-    "excessive_hunger",
-    "extra_marital_contacts",
-    "family_history",
-    "fast_heart_rate",
-    "fatigue",
-    "fluid_overload",
-    "foul_smell_of urine",
-    "headache",
-    "high_fever",
-    "hip_joint_pain",
-    "history_of_alcohol_consumption",
-    "increased_appetite",
-    "indigestion",
-    "inflammatory_nails",
-    "internal_itching",
-    "irregular_sugar_level",
-    "irritability",
-    "irritation_in_anus",
-    "itching",
-    "joint_pain",
-    "knee_pain",
-    "lack_of_concentration",
-    "lethargy",
-    "loss_of_appetite",
-    "loss_of_balance",
-    "loss_of_smell",
-    "malaise",
-    "mild_fever",
-    "mood_swings",
-    "movement_stiffness",
-    "mucoid_sputum",
-    "muscle_pain",
-    "muscle_wasting",
-    "muscle_weakness",
-    "nausea",
-    "neck_pain",
-    "nodal_skin_eruptions",
-    "obesity",
-    "pain_behind_the_eyes",
-    "pain_during_bowel_movements",
-    "pain_in_anal_region",
-    "painful_walking",
-    "palpitations",
-    "passage_of_gases",
-    "patches_in_throat",
-    "phlegm",
-    "polyuria",
-    "prominent_veins_on_calf",
-    "puffy_face_and_eyes",
-    "pus_filled_pimples",
-    "receiving_blood_transfusion",
-    "receiving_unsterile_injections",
-    "red_sore_around_nose",
-    "red_spots_over_body",
-    "redness_of_eyes",
-    "restlessness",
-    "runny_nose",
-    "rusty_sputum",
-    "scurring",
-    "shivering",
-    "silver_like_dusting",
-    "sinus_pressure",
-    "skin_peeling",
-    "skin_rash",
-    "slurred_speech",
-    "small_dents_in_nails",
-    "spinning_movements",
-    "spotting_ urination",
-    "stiff_neck",
-    "stomach_bleeding",
-    "stomach_pain",
-    "sunken_eyes",
-    "sweating",
-    "swelled_lymph_nodes",
-    "swelling_joints",
-    "swelling_of_stomach",
-    "swollen_blood_vessels",
-    "swollen_extremeties",
-    "swollen_legs",
-    "throat_irritation",
-    "toxic_look_(typhos)",
-    "ulcers_on_tongue",
-    "unsteadiness",
-    "visual_disturbances",
-    "vomiting",
-    "watering_from_eyes",
-    "weakness_in_limbs",
-    "weakness_of_one_body_side",
-    "weight_gain",
-    "weight_loss",
-    "yellow_crust_ooze",
-    "yellow_urine",
-    "yellowing_of_eyes",
-    "yellowish_skin"
+    "pain",
+    "respiratory",
+    "fever",
+    "digestive",
+    "urinary",
+    "skin",
+    "neurological",
+    "vision",
+    "energy",
+    "mental",
+    "joint_muscle",
+    "appetite_weight",
+    "other"
   ],
-  "top_10_features": [
+  "feature_importance": [
     {
-      "feature": "muscle_pain",
-      "importance": 0.01763569295349466
+      "feature": "other",
+      "importance": 0.14738466611679354
     },
     {
-      "feature": "yellowing_of_eyes",
-      "importance": 0.015620618525774423
+      "feature": "pain",
+      "importance": 0.12035336088467115
     },
     {
-      "feature": "family_history",
-      "importance": 0.015610867862413608
+      "feature": "skin",
+      "importance": 0.1037811848768026
     },
     {
-      "feature": "diarrhoea",
-      "importance": 0.014973381314581695
+      "feature": "digestive",
+      "importance": 0.09925695140473322
     },
     {
-      "feature": "high_fever",
-      "importance": 0.014850916664409243
+      "feature": "neurological",
+      "importance": 0.07723876012714198
     },
     {
-      "feature": "unsteadiness",
-      "importance": 0.014774761331631255
+      "feature": "fever",
+      "importance": 0.0733519284532456
     },
     {
-      "feature": "fatigue",
-      "importance": 0.014613300410960308
+      "feature": "energy",
+      "importance": 0.072240448497452
     },
     {
-      "feature": "lack_of_concentration",
-      "importance": 0.014593298642899086
+      "feature": "respiratory",
+      "importance": 0.07198673763552703
     },
     {
-      "feature": "altered_sensorium",
-      "importance": 0.014504783601649507
+      "feature": "urinary",
+      "importance": 0.05405820707511087
     },
     {
-      "feature": "joint_pain",
-      "importance": 0.014177336054973434
+      "feature": "mental",
+      "importance": 0.054012761578668265
+    },
+    {
+      "feature": "joint_muscle",
+      "importance": 0.052577126967824996
+    },
+    {
+      "feature": "vision",
+      "importance": 0.04919464801228541
+    },
+    {
+      "feature": "appetite_weight",
+      "importance": 0.024563218369743414
     }
   ]
 }

@@ -14,3 +14,29 @@ export interface SymptomListResponse {
   total: number;
 }
 
+/**
+ * Symptom option in a group
+ */
+export interface SymptomOption {
+  id: number;
+  name: string;
+  display_name: string;
+}
+
+/**
+ * Symptom group (question with options)
+ */
+export interface SymptomGroup {
+  id: string;
+  question: string;
+  options: SymptomOption[];
+  allow_multiple: boolean;
+}
+
+/**
+ * Symptom groups response
+ */
+export interface SymptomGroupsResponse {
+  groups: SymptomGroup[];
+}
+

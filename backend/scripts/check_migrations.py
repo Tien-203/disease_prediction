@@ -41,19 +41,46 @@ def get_head_revision(alembic_cfg):
     """Get head revision from Alembic"""
     script = ScriptDirectory.from_config(alembic_cfg)
     head_rev = script.get_current_head()
+    if head_rev is None:
+        logger.warning("No migrations found in the versions directory")
     return head_rev
+
+
+def get_alembic_config():
+    """Get Alembic config with proper path resolution"""
+    # Get backend directory (parent of scripts directory)
+    backend_dir = Path(__file__).parent.parent
+    alembic_ini_path = backend_dir / "alembic.ini"
+    
+    if not alembic_ini_path.exists():
+        raise FileNotFoundError(f"alembic.ini not found at {alembic_ini_path}")
+    
+    # Create config with absolute path
+    # Alembic will resolve relative paths in alembic.ini relative to the ini file's directory
+    alembic_cfg = Config(str(alembic_ini_path))
+    
+    # Ensure the script_location is resolved relative to backend_dir
+    script_location = alembic_cfg.get_main_option("script_location")
+    if script_location and not Path(script_location).is_absolute():
+        # Resolve relative to backend_dir
+        resolved_script_location = (backend_dir / script_location).resolve()
+        alembic_cfg.set_main_option("script_location", str(resolved_script_location))
+    
+    return alembic_cfg
 
 
 def run_migrations():
     """Run Alembic migrations to head"""
     try:
         logger.info("Running database migrations...")
-        alembic_cfg = Config("alembic.ini")
+        alembic_cfg = get_alembic_config()
         command.upgrade(alembic_cfg, "head")
         logger.success("Migrations completed successfully")
         return True
     except Exception as e:
         logger.error(f"Migration failed: {e}")
+        import traceback
+        logger.debug(traceback.format_exc())
         return False
 
 
@@ -67,11 +94,16 @@ def check_and_migrate():
         
         # Get current and head revisions
         current_rev = get_current_revision(engine)
-        alembic_cfg = Config("alembic.ini")
+        alembic_cfg = get_alembic_config()
         head_rev = get_head_revision(alembic_cfg)
         
         logger.info(f"Current revision: {current_rev or 'None (empty database)'}")
-        logger.info(f"Head revision: {head_rev}")
+        logger.info(f"Head revision: {head_rev or 'None (no migrations found)'}")
+        
+        # If no migrations exist, nothing to do
+        if head_rev is None:
+            logger.warning("No migrations found. Database schema may need to be created manually.")
+            return True
         
         # Check if migration is needed
         if current_rev == head_rev:

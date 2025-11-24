@@ -1,12 +1,35 @@
 @import '../../../styles/design-tokens';
 
-// Custom dark green background
-.bg-dark-green {
-  background-color: $dark-green;
+// Header container
+.app-header {
+  background-color: #2D3B35; // Dark green from image
+  width: 100%;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.header-container {
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 70px;
 }
 
 // Header Logo
+.header-brand {
+  flex-shrink: 0;
+}
+
 .header-logo {
+  color: #ffffff;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 18px;
   transition: opacity 0.2s ease;
 
   &:hover {
@@ -14,73 +37,71 @@
   }
 }
 
-// Nav Links with underline effect
+// Navigation
+.header-nav {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+}
+
+// Nav Links
 .nav-link {
-  position: relative;
+  color: #ffffff;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 16px;
   transition: color 0.2s ease;
-
-  &::after {
-    content: '';
-    position: absolute;
-    left: 0;
-    bottom: -6px;
-    width: 0;
-    height: 3px;
-    border-radius: 999px;
-    background-color: $lime-green;
-    transition: width 0.2s ease;
-  }
+  position: relative;
 
   &:hover {
-    color: white !important;
-
-    &::after {
-      width: 100%;
-    }
+    color: #B8E070; // Light green/yellow hover
   }
 
+  // Active state - highlighted in light green/yellow
   &.nav-link-active {
-    color: white !important;
-
-    &::after {
-      width: 100%;
-    }
+    color: #B8E070; // Light green/yellow from image
   }
 }
 
-// Role Switcher Button
-.btn-role-switcher {
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  background-color: rgba(255, 255, 255, 0.1);
-  color: white;
-  padding: 6px 16px;
-  border-radius: 6px;
-  transition: all 0.2s ease;
+// Logout Button
+.btn-logout {
+  background-color: #B8E070; // Light green/yellow from image
+  color: #2D3B35; // Dark green text
+  border: none;
+  border-radius: 18px; // Rounded corners
+  padding: 10px 24px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.15s ease;
 
   &:hover {
-    background-color: rgba(255, 255, 255, 0.2);
-    border-color: rgba(255, 255, 255, 0.5);
-    color: white;
+    background-color: #A8D060; // Slightly darker on hover
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: translateY(0);
   }
 }
 
-.dropdown-arrow {
-  font-size: 10px;
+// Guest Navigation
+.header-guest {
+  display: flex;
+  align-items: center;
 }
 
-// Role Dropdown Menu
-.role-dropdown-menu {
-  min-width: 200px;
+.btn-login {
+  color: #ffffff;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 16px;
+  padding: 8px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 8px;
+  transition: background-color 0.2s ease;
 
-  li {
-    &.active {
-      background-color: rgba(139, 195, 74, 0.15);
-      font-weight: 600;
-      color: $dark-green;
-    }
-
-    &:hover {
-      background-color: rgba(139, 195, 74, 0.1);
-    }
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.1);
   }
 }

@@ -42,24 +42,25 @@ python ml/scripts/download_data.py
 
 This downloads a disease-symptom dataset from Kaggle and saves it to `ml/data/raw/`.
 
-### Step 2: Preprocess Data
+### Step 2: Preprocess Data with Groups
 
 ```bash
-python ml/scripts/preprocess_data.py
+python ml/scripts/preprocess_data_with_groups.py
 ```
 
-This cleans and processes the raw data, saving the result to `ml/data/processed/`.
+This processes the raw data by mapping symptoms to 13 groups, saving the result to `ml/data/processed/processed_dataset_with_groups.csv`.
 
-### Step 3: Train Model
+### Step 3: Train Model with Groups
 
 ```bash
-python ml/scripts/train_model.py
+python ml/scripts/train_model_with_groups.py
 ```
 
-This trains a Random Forest classifier and saves:
+This trains a Random Forest classifier using group-based features and saves:
 - `ml/models/random_forest_model.pkl` - Trained model
 - `ml/models/label_encoder.pkl` - Disease label encoder
-- `ml/models/feature_names.pkl` - Feature names
+- `ml/models/feature_names.pkl` - Group feature names (13 groups)
+- `ml/models/group_encoders.pkl` - Group encoders for symptom combinations
 - `ml/models/model_metadata.json` - Model performance metrics
 
 ### Step 4: Evaluate Model
@@ -81,9 +82,10 @@ backend/ml/
 ├── notebooks/            # Jupyter notebooks for exploration
 ├── scripts/              # Training scripts
 │   ├── download_data.py
-│   ├── preprocess_data.py
-│   ├── train_model.py
+│   ├── preprocess_data_with_groups.py
+│   ├── train_model_with_groups.py
 │   ├── evaluate_model.py
+│   ├── test_model_inference.py
 │   └── utils.py
 └── requirements.txt
 ```
@@ -96,8 +98,10 @@ backend/ml/
 - max_depth: None
 - random_state: 42
 
-**Input**: Binary feature vector representing symptoms
+**Input**: 13 group-based features (symptoms mapped to groups)
 **Output**: Predicted disease with confidence score
+
+**Groups**: pain, respiratory, fever, digestive, urinary, skin, neurological, vision, energy, mental, joint_muscle, appetite_weight, other
 
 ## Using the Trained Model
 
@@ -106,6 +110,8 @@ After training, the model files in `ml/models/` will be automatically loaded by 
 ## Notes
 
 - The dataset contains symptom-disease mappings
-- Features are binary (symptom present/absent)
+- Symptoms are mapped to 13 groups before training
+- Each group contains symptom combinations (comma-separated symptom names)
+- Group encoders are used to encode symptom combinations to numerical values
 - The model supports multiple disease classifications
 - Training typically takes 1-5 minutes depending on dataset size

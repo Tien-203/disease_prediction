@@ -17,7 +17,11 @@ class DiseasePredictor:
             model_loader: Instance of ModelLoader with loaded models
         """
         self.model_loader = model_loader
-        self.preprocessor = DataPreprocessor(model_loader.get_feature_names())
+        group_encoders = model_loader.get_group_encoders()
+        self.preprocessor = DataPreprocessor(
+            model_loader.get_feature_names(),
+            group_encoders=group_encoders
+        )
     
     def predict(self, symptoms: List[str]) -> Tuple[str, float, List[Tuple[str, float]]]:
         """

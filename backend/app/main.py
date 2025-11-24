@@ -33,14 +33,25 @@ async def lifespan(app: FastAPI):
     # Startup
     logger.info("Starting Disease Prediction API...")
     
-    # Create database tables
+    # Create database tables and run migrations
     try:
         # Test database connection first
         with engine.connect() as connection:
             connection.execute(text("SELECT 1"))
         logger.info("Database connection successful")
         
-        # Create tables
+        # Run Alembic migrations
+        try:
+            from scripts.check_migrations import check_and_migrate
+            logger.info("Checking and running database migrations...")
+            check_and_migrate()
+        except Exception as migration_error:
+            logger.warning(f"Could not run migrations: {migration_error}")
+            logger.info("Falling back to creating tables from models...")
+            import traceback
+            logger.debug(traceback.format_exc())
+        
+        # Create tables (fallback if migrations fail)
         Base.metadata.create_all(bind=engine)
         logger.info("Database tables created/verified")
         
@@ -74,17 +85,24 @@ async def lifespan(app: FastAPI):
     # Load ML models
     logger.info("Loading ML models...")
     try:
+        # Check if group encoders file exists (for group-based models)
+        from pathlib import Path
+        base_path = Path(__file__).parent.parent
+        group_encoders_path = base_path / settings.GROUP_ENCODERS_PATH
+        group_encoders_path_param = settings.GROUP_ENCODERS_PATH if group_encoders_path.exists() else None
+        
         success = model_loader.load_models(
             model_path=settings.MODEL_PATH,
             label_encoder_path=settings.LABEL_ENCODER_PATH,
-            feature_names_path=settings.FEATURE_NAMES_PATH
+            feature_names_path=settings.FEATURE_NAMES_PATH,
+            group_encoders_path=group_encoders_path_param
         )
         if success:
             logger.info("ML models loaded successfully")
         else:
             logger.warning(
                 "ML models not loaded. "
-                "Please train the model using ml/scripts/train_model.py"
+                "Please train the model using ml/scripts/train_model_with_groups.py"
             )
     except Exception as e:
         logger.error(f"Error loading ML models: {e}")

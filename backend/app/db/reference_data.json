@@ -1,6 +1,6 @@
 {
   "source": "processed_dataset.csv",
-  "import_timestamp": "2025-11-08T09:40:09.106580",
+  "import_timestamp": "2025-11-27T13:42:07.765953",
   "symptoms": [
     "abdominal_pain",
     "abnormal_menstruation",
@@ -175,7 +175,8 @@
     "Typhoid",
     "Urinary tract infection",
     "Varicose veins",
-    "hepatitis A"
+    "hepatitis A",
+    "tiểu đường"
   ],
   "disease_recommendations": {
     "(vertigo) Paroymsal  Positional Vertigo": "Avoid sudden head movements. Perform Epley maneuver exercises as directed by a healthcare provider. Sleep with head elevated. Avoid positions that trigger vertigo. Consult a neurologist for persistent symptoms.",
@@ -218,10 +219,11 @@
     "Typhoid": "Seek medical attention for antibiotic treatment. Rest and maintain adequate hydration. Follow a soft, easily digestible diet. Practice good hygiene to prevent spread. Complete the full course of antibiotics.",
     "Urinary tract infection": "Drink plenty of water to flush bacteria. Take prescribed antibiotics as directed. Complete the full course of treatment. Urinate frequently and avoid holding urine. Consult a doctor if symptoms persist or recur frequently.",
     "Varicose veins": "Elevate legs when resting. Wear compression stockings as recommended. Engage in regular exercise to improve circulation. Avoid prolonged standing or sitting. Consult a vascular specialist for severe cases or if complications arise.",
-    "hepatitis A": "Rest and maintain adequate hydration. Most cases resolve on their own within a few weeks. Practice good hygiene to prevent spread. Avoid alcohol during recovery. Get vaccinated if not already immune."
+    "hepatitis A": "Rest and maintain adequate hydration. Most cases resolve on their own within a few weeks. Practice good hygiene to prevent spread. Avoid alcohol during recovery. Get vaccinated if not already immune.",
+    "tiểu đường": "Please consult a healthcare provider for proper diagnosis and treatment."
   },
   "statistics": {
     "total_symptoms": 131,
-    "total_diseases": 41
+    "total_diseases": 42
   }
 }

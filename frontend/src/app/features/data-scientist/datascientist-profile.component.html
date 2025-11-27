@@ -2,7 +2,15 @@
   <section class="ds-profile__card">
     <h1 class="ds-profile__title">Personal Information</h1>
 
-    <form (ngSubmit)="saveProfile()" class="ds-profile__form" novalidate>
+    <div *ngIf="error" class="ds-profile__error" role="alert">
+      {{ error }}
+    </div>
+
+    <div *ngIf="success" class="ds-profile__success" role="alert">
+      {{ success }}
+    </div>
+
+    <form (ngSubmit)="saveProfile()" class="ds-profile__form" *ngIf="!loading" novalidate>
       <label class="ds-profile__label" for="name">Data Scientist Name</label>
       <input
         id="name"
@@ -12,6 +20,7 @@
         [(ngModel)]="name"
         class="ds-profile__input"
         placeholder="Enter your name"
+        [disabled]="saving"
       />
 
       <label class="ds-profile__label" for="idNumber">ID Number</label>
@@ -23,14 +32,18 @@
         [(ngModel)]="idNumber"
         class="ds-profile__input"
         placeholder="Enter your ID"
+        [disabled]="saving"
       />
 
-      <button type="submit" class="ds-profile__button">
-        Save
+      <button type="submit" class="ds-profile__button" [disabled]="saving">
+        <span *ngIf="!saving">Save</span>
+        <span *ngIf="saving">Saving...</span>
       </button>
-
-      <p class="ds-profile__success" *ngIf="showSuccess">Profile updated successfully.</p>
     </form>
+
+    <div *ngIf="loading" class="ds-profile__loading">
+      <p>Loading profile...</p>
+    </div>
   </section>
 </div>
 

@@ -63,4 +63,11 @@ class AuthResponse(BaseModel):
     user: UserResponse
 
 
+class UserUpdate(BaseModel):
+    """Schema for updating user profile"""
+    name: Optional[str] = None
+    age: Optional[int] = Field(None, ge=0, le=150)
+    gender: Optional[str] = None
+
+
 

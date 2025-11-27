@@ -59,7 +59,7 @@
   font-weight: 600;
 }
 
-.ds-dataset__questions {
+.ds-dataset__symptoms {
   margin: 0;
   padding-left: 18px;
   display: flex;
@@ -67,6 +67,270 @@
   gap: 6px;
   color: #143525;
   font-size: 16px;
+}
+
+.ds-dataset__controls {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 32px;
+  flex-wrap: wrap;
+}
+
+.ds-dataset__search {
+  flex: 1;
+  min-width: 200px;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.ds-dataset__search-icon {
+  position: absolute;
+  left: 12px;
+  font-size: 18px;
+  pointer-events: none;
+}
+
+.ds-dataset__search input {
+  width: 100%;
+  padding: 12px 16px 12px 40px;
+  border: 1px solid rgba(16, 45, 36, 0.2);
+  border-radius: 8px;
+  background-color: white;
+  font-size: 16px;
+  color: #102d21;
+  outline: none;
+  transition: border-color 0.2s;
+
+  &:focus {
+    border-color: #113226;
+  }
+
+  &::placeholder {
+    color: rgba(16, 45, 36, 0.5);
+  }
+}
+
+.ds-dataset__actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.ds-dataset__refresh-btn {
+  width: 44px;
+  height: 44px;
+  border: none;
+  border-radius: 8px;
+  background-color: #113226;
+  color: #cce97b;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s, transform 0.2s;
+
+  &:hover:not(:disabled) {
+    background-color: #0f2a1f;
+    transform: scale(1.05);
+  }
+
+  &:active:not(:disabled) {
+    transform: scale(0.95);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.ds-dataset__refresh-icon {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.ds-dataset__performance-btn {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  background-color: #4a5568;
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: #2d3748;
+  }
+}
+
+.ds-dataset__empty,
+.ds-dataset__loading {
+  text-align: center;
+  padding: 48px 24px;
+  color: rgba(16, 45, 36, 0.6);
+  font-size: 18px;
+}
+
+// Performance Modal Styles
+.ds-performance-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.ds-performance-modal {
+  background-color: #f5f9e9;
+  border-radius: 16px;
+  padding: 32px;
+  max-width: 900px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  box-shadow: 0 24px 48px rgba(16, 45, 36, 0.3);
+}
+
+.ds-performance-modal__close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: none;
+  font-size: 28px;
+  color: #113226;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: rgba(16, 45, 36, 0.1);
+  }
+}
+
+.ds-performance-modal__title {
+  margin: 0 0 24px;
+  font-size: 32px;
+  color: #113226;
+  font-weight: 700;
+}
+
+.ds-performance-modal__section {
+  margin-bottom: 32px;
+}
+
+.ds-performance-modal__section-title {
+  margin: 0 0 16px;
+  font-size: 24px;
+  color: #113226;
+  font-weight: 700;
+}
+
+.ds-performance-modal__table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #cce97b;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.ds-performance-modal__table thead {
+  background-color: #cce97b;
+}
+
+.ds-performance-modal__table th {
+  padding: 12px 16px;
+  text-align: left;
+  font-weight: 600;
+  color: #103124;
+  font-size: 16px;
+}
+
+.ds-performance-modal__table td {
+  padding: 12px 16px;
+  color: #102d21;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.ds-performance-modal__table tbody tr:not(:last-child) {
+  border-bottom: 1px solid rgba(16, 45, 36, 0.1);
+}
+
+.ds-performance-modal__info {
+  background-color: rgba(204, 233, 123, 0.3);
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 24px;
+
+  p {
+    margin: 8px 0;
+    color: #102d21;
+    font-size: 14px;
+
+    strong {
+      color: #113226;
+    }
+  }
+}
+
+.ds-performance-modal__disease-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.ds-performance-modal__disease-item {
+  background-color: rgba(204, 233, 123, 0.5);
+  padding: 16px;
+  border-radius: 8px;
+  border: 1px solid rgba(16, 45, 36, 0.1);
+}
+
+.ds-performance-modal__disease-name {
+  font-size: 18px;
+  font-weight: 700;
+  color: #113226;
+  margin-bottom: 12px;
+}
+
+.ds-performance-modal__disease-metrics {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  span {
+    font-size: 14px;
+    color: #102d21;
+
+    strong {
+      color: #113226;
+      margin-right: 8px;
+    }
+  }
+}
+
+.ds-performance-modal__loading {
+  text-align: center;
+  padding: 48px 24px;
+  color: rgba(16, 45, 36, 0.6);
+  font-size: 18px;
 }
 
 @media (max-width: 1024px) {

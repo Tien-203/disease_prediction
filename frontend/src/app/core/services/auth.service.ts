@@ -264,6 +264,96 @@ export class AuthService {
     return roles.some(role => role.toLowerCase() === userRole);
   }
 
+  /**
+   * Get current user profile from API
+   */
+  getProfile(): Observable<any> {
+    return this.apiService.get('/auth/me').pipe(
+      tap((user: any) => {
+        // Update localStorage with fresh user data
+        if (user) {
+          const userData: any = {
+            id: user.id,
+            email: user.email,
+            name: user.name,
+            age: user.age,
+            gender: user.gender,
+            role: user.role,
+            is_active: user.is_active
+          };
+          
+          // Convert datetime objects to ISO strings for localStorage
+          if (user.created_at) {
+            userData.created_at = typeof user.created_at === 'string' 
+              ? user.created_at 
+              : new Date(user.created_at).toISOString();
+          }
+          if (user.updated_at) {
+            userData.updated_at = typeof user.updated_at === 'string'
+              ? user.updated_at
+              : new Date(user.updated_at).toISOString();
+          }
+          if (user.last_login) {
+            userData.last_login = typeof user.last_login === 'string'
+              ? user.last_login
+              : new Date(user.last_login).toISOString();
+          }
+          
+          localStorage.setItem(this.USER_KEY, JSON.stringify(userData));
+        }
+      }),
+      catchError((error: any) => {
+        console.error('Error fetching profile:', error);
+        return throwError(() => new Error(error?.error?.detail || error?.message || 'Failed to fetch profile'));
+      })
+    );
+  }
+
+  /**
+   * Update current user profile
+   */
+  updateProfile(profileData: { name?: string; age?: number; gender?: string }): Observable<any> {
+    return this.apiService.put('/auth/me', profileData).pipe(
+      tap((user: any) => {
+        // Update localStorage with updated user data
+        if (user) {
+          const userData: any = {
+            id: user.id,
+            email: user.email,
+            name: user.name,
+            age: user.age,
+            gender: user.gender,
+            role: user.role,
+            is_active: user.is_active
+          };
+          
+          // Convert datetime objects to ISO strings for localStorage
+          if (user.created_at) {
+            userData.created_at = typeof user.created_at === 'string' 
+              ? user.created_at 
+              : new Date(user.created_at).toISOString();
+          }
+          if (user.updated_at) {
+            userData.updated_at = typeof user.updated_at === 'string'
+              ? user.updated_at
+              : new Date(user.updated_at).toISOString();
+          }
+          if (user.last_login) {
+            userData.last_login = typeof user.last_login === 'string'
+              ? user.last_login
+              : new Date(user.last_login).toISOString();
+          }
+          
+          localStorage.setItem(this.USER_KEY, JSON.stringify(userData));
+        }
+      }),
+      catchError((error: any) => {
+        console.error('Error updating profile:', error);
+        return throwError(() => new Error(error?.error?.detail || error?.message || 'Failed to update profile'));
+      })
+    );
+  }
+
   private handleAuthSuccess(
     response: any,
     options: { email: string; fallbackRole?: string; fallbackName?: string }

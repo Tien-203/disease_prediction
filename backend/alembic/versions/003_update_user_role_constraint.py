@@ -41,3 +41,4 @@ def downgrade() -> None:
         "role IN ('patient', 'data_scientist')"
     )
 
+

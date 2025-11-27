@@ -1,9 +1,10 @@
 .ds-dashboard {
-  min-height: calc(100vh - 160px);
-  background-color: #f5f9e9;
-  padding: 92px 64px;
+  min-height: calc(100vh - 70px);
+  background-color: #f5f9e9; // Light green/off-white background
+  padding: 60px 64px;
   display: flex;
   justify-content: center;
+  align-items: flex-start;
 }
 
 .ds-dashboard__hero {
@@ -11,7 +12,7 @@
   max-width: 940px;
   padding: 64px 56px;
   border-radius: 32px;
-  background-color: rgba(247, 251, 237, 0.94);
+  background-color: #f5f9e9; // Light green background matching the page
   box-shadow: 0 22px 45px rgba(16, 45, 36, 0.08);
   border: 1px solid rgba(16, 45, 36, 0.08);
 }
@@ -19,14 +20,14 @@
 .ds-dashboard__title {
   margin: 0 0 16px;
   font-size: 44px;
-  color: #113226;
+  color: #113226; // Dark font color
   font-weight: 700;
 }
 
 .ds-dashboard__subtitle {
   margin: 0 0 40px;
   font-size: 22px;
-  color: #2f483c;
+  color: #2f483c; // Dark font color
 }
 
 .ds-dashboard__actions {
@@ -52,24 +53,61 @@
 }
 
 .ds-button--primary {
-  background-color: #c9ea74;
-  color: #102d24;
+  background-color: #c9ea74; // Light green button
+  color: #102d24; // Dark text
   box-shadow: 0 16px 26px rgba(201, 234, 116, 0.28);
+  border-radius: 18px; // Rounded corners
+  padding: 18px 34px;
+  font-size: 16px;
+  font-weight: 600;
+  white-space: normal;
+  line-height: 1.4;
 
   &:hover {
     transform: translateY(-2px);
     box-shadow: 0 20px 32px rgba(201, 234, 116, 0.35);
+    background-color: #b8d963;
   }
 }
 
 .ds-button--secondary {
-  background-color: #113226;
-  color: #f5f9ee;
-  box-shadow: 0 14px 28px rgba(17, 50, 38, 0.25);
+  background-color: #c9ea74; // Light green button (same as primary based on image)
+  color: #102d24; // Dark text
+  box-shadow: 0 14px 28px rgba(201, 234, 116, 0.25);
+  border-radius: 18px; // Rounded corners
+  padding: 18px 34px;
+  font-size: 16px;
+  font-weight: 600;
+  white-space: normal;
+  line-height: 1.4;
 
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 18px 32px rgba(17, 50, 38, 0.32);
+    box-shadow: 0 18px 32px rgba(201, 234, 116, 0.32);
+    background-color: #b8d963;
+  }
+}
+
+.ds-button--danger {
+  background-color: #dc3545; // Red color for delete
+  color: #ffffff;
+  box-shadow: 0 14px 28px rgba(220, 53, 69, 0.25);
+  border-radius: 18px;
+  padding: 18px 34px;
+  font-size: 16px;
+  font-weight: 600;
+  white-space: normal;
+  line-height: 1.4;
+
+  &:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 18px 32px rgba(220, 53, 69, 0.32);
+    background-color: #c82333;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
   }
 }
 
@@ -89,10 +127,19 @@
   position: relative;
   width: 100%;
   max-width: 660px;
+  max-height: 90vh;
   background-color: #f8fbf1;
   border-radius: 28px;
   padding: 44px 48px 36px;
   box-shadow: 0 28px 60px rgba(16, 45, 36, 0.22);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.ds-modal--small {
+  max-width: 500px;
+  padding: 36px 40px 28px;
 }
 
 .ds-modal__close {
@@ -154,6 +201,29 @@
   display: flex;
   flex-direction: column;
   gap: 20px;
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
+  padding-right: 8px;
+  
+  // Custom scrollbar styling
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: rgba(16, 45, 36, 0.08);
+    border-radius: 4px;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: rgba(16, 45, 36, 0.2);
+    border-radius: 4px;
+    
+    &:hover {
+      background: rgba(16, 45, 36, 0.3);
+    }
+  }
 }
 
 .ds-modal__title {
@@ -215,9 +285,14 @@
 .ds-tree__row {
   display: flex;
   justify-content: center;
-  gap: 32px;
+  gap: 16px;
   position: relative;
   flex-wrap: wrap;
+  margin-bottom: 24px;
+  
+  &:last-child {
+    margin-bottom: 0;
+  }
 }
 
 .ds-tree__row:not(.ds-tree__row--root)::before {
@@ -233,17 +308,24 @@
 }
 
 .ds-tree__node {
-  min-width: 140px;
-  padding: 14px 22px;
+  min-width: 120px;
+  max-width: 150px;
+  padding: 12px 18px;
   border-radius: 16px;
   border: 2px solid rgba(16, 45, 36, 0.18);
   background-color: #e8f4d4;
   color: #113226;
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 600;
   box-shadow: 0 12px 24px rgba(17, 50, 38, 0.12);
   cursor: pointer;
   transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .ds-tree__node:hover {
@@ -264,10 +346,109 @@
   box-shadow: 0 14px 28px rgba(138, 123, 255, 0.35);
 }
 
+.ds-tree__node--selected {
+  background-color: #a8d060; // Darker green for selected symptom groups
+  border-color: #0f2d24;
+  color: #0f2d24;
+  font-weight: 700;
+}
+
+.ds-tree__node--has-selection {
+  background-color: #b8d963; // Lighter green when has selected symptoms
+  border-color: #0f2d24;
+}
+
+.ds-tree__badge {
+  display: inline-block;
+  background-color: #0f2d24;
+  color: #c9ea74;
+  border-radius: 12px;
+  padding: 2px 8px;
+  font-size: 12px;
+  font-weight: 700;
+  margin-left: 8px;
+  min-width: 20px;
+  text-align: center;
+}
+
+.ds-tree__group-container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.ds-tree__symptoms {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-top: 12px;
+  background-color: #ffffff;
+  border: 2px solid rgba(16, 45, 36, 0.18);
+  border-radius: 16px;
+  padding: 12px;
+  min-width: 200px;
+  max-width: 300px;
+  max-height: 300px;
+  overflow-y: auto;
+  box-shadow: 0 8px 24px rgba(16, 45, 36, 0.15);
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ds-tree__symptom-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+  
+  &:hover {
+    background-color: #f0f7e8;
+  }
+}
+
+.ds-tree__symptom-item--selected {
+  background-color: #e8f4d4;
+  font-weight: 600;
+}
+
+.ds-tree__symptom-checkbox {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(16, 45, 36, 0.3);
+  border-radius: 4px;
+  background-color: #ffffff;
+  color: #0f2d24;
+  font-size: 12px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.ds-tree__symptom-item--selected .ds-tree__symptom-checkbox {
+  background-color: #c9ea74;
+  border-color: #0f2d24;
+}
+
+.ds-tree__symptom-name {
+  flex: 1;
+  font-size: 14px;
+  color: #113226;
+}
+
 .ds-tree__actions {
   margin-top: 32px;
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
+  align-items: center;
   gap: 18px;
 }
 

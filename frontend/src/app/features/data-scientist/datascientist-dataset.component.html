@@ -2,24 +2,140 @@
   <section class="ds-dataset__card">
     <h1 class="ds-dataset__title">Dataset</h1>
 
-    <div class="ds-dataset__list">
-      <article class="ds-dataset__item" *ngFor="let record of records">
+    <div class="ds-dataset__controls">
+      <div class="ds-dataset__search">
+        <span class="ds-dataset__search-icon">🔍</span>
+        <input
+          type="text"
+          placeholder="Search for disease"
+          [(ngModel)]="searchTerm"
+        />
+      </div>
+      
+      <div class="ds-dataset__actions">
+        <button 
+          type="button" 
+          class="ds-dataset__refresh-btn"
+          (click)="refreshDataset()"
+          [disabled]="isLoading"
+          title="Refresh dataset"
+        >
+          <span class="ds-dataset__refresh-icon">↻</span>
+        </button>
+        
+        <button 
+          type="button" 
+          class="ds-dataset__performance-btn"
+          (click)="openPerformanceModal()"
+        >
+          Modal Performance
+        </button>
+      </div>
+    </div>
+
+    <div class="ds-dataset__list" *ngIf="!isLoading">
+      <article class="ds-dataset__item" *ngFor="let record of filteredRecords">
         <div class="ds-dataset__column">
           <span class="ds-dataset__label">Date Modified</span>
-          <span class="ds-dataset__value">{{ record.dateModified }}</span>
+          <span class="ds-dataset__value">{{ record.date_modified }}</span>
         </div>
         <div class="ds-dataset__column">
           <span class="ds-dataset__label">Disease</span>
           <span class="ds-dataset__value">{{ record.disease }}</span>
         </div>
         <div class="ds-dataset__column">
-          <span class="ds-dataset__label">Questions</span>
-          <ul class="ds-dataset__questions">
-            <li *ngFor="let question of record.questions">{{ question }}</li>
+          <span class="ds-dataset__label">Symptoms</span>
+          <ul class="ds-dataset__symptoms">
+            <li *ngFor="let symptom of record.symptoms">{{ symptom }}</li>
           </ul>
         </div>
       </article>
+      
+      <div class="ds-dataset__empty" *ngIf="filteredRecords.length === 0">
+        <p>No records found{{ searchTerm ? ' matching your search' : '' }}.</p>
+      </div>
+    </div>
+
+    <div class="ds-dataset__loading" *ngIf="isLoading">
+      <p>Loading dataset...</p>
     </div>
   </section>
+</div>
+
+<!-- Model Performance Modal -->
+<div class="ds-performance-modal-overlay" *ngIf="performanceModalOpen" (click)="closePerformanceModal()">
+  <div class="ds-performance-modal" (click)="$event.stopPropagation()">
+    <button 
+      type="button" 
+      class="ds-performance-modal__close" 
+      aria-label="Close performance modal"
+      (click)="closePerformanceModal()"
+    >
+      &times;
+    </button>
+
+    <h2 class="ds-performance-modal__title">Model Performance</h2>
+
+    <div class="ds-performance-modal__content" *ngIf="!isLoadingPerformance && modelPerformance">
+      <!-- Overall Metrics -->
+      <div class="ds-performance-modal__section">
+        <h3 class="ds-performance-modal__section-title">Overall metric</h3>
+        <table class="ds-performance-modal__table">
+          <thead>
+            <tr>
+              <th>Accuracy</th>
+              <th>Precision</th>
+              <th>Recall</th>
+              <th>F1</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>{{ formatPercentage(modelPerformance.overall_metrics.accuracy) }}</td>
+              <td>{{ formatPercentage(modelPerformance.overall_metrics.precision) }}</td>
+              <td>{{ formatPercentage(modelPerformance.overall_metrics.recall) }}</td>
+              <td>{{ formatPercentage(modelPerformance.overall_metrics.f1_score) }}</td>
+            </tr>
+            <tr *ngIf="modelPerformance.overall_metrics.accuracy_std">
+              <td>^ {{ modelPerformance.overall_metrics.accuracy_std }}%</td>
+              <td>^ {{ modelPerformance.overall_metrics.precision_std }}%</td>
+              <td>^ {{ modelPerformance.overall_metrics.recall_std }}%</td>
+              <td>^ {{ modelPerformance.overall_metrics.f1_std }}%</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Model Info -->
+      <div class="ds-performance-modal__info">
+        <p><strong>Model Type:</strong> {{ modelPerformance.model_type }}</p>
+        <p *ngIf="modelPerformance.n_estimators"><strong>N Estimators:</strong> {{ modelPerformance.n_estimators }}</p>
+        <p><strong>Features:</strong> {{ modelPerformance.n_features }}</p>
+        <p><strong>Classes:</strong> {{ modelPerformance.n_classes }}</p>
+      </div>
+
+      <!-- Per-Disease Performance -->
+      <div class="ds-performance-modal__section">
+        <h3 class="ds-performance-modal__section-title">Per-Disease Performance</h3>
+        <div class="ds-performance-modal__disease-list">
+          <div 
+            class="ds-performance-modal__disease-item"
+            *ngFor="let disease of modelPerformance.per_disease_performance"
+          >
+            <div class="ds-performance-modal__disease-name">{{ disease.disease }}</div>
+            <div class="ds-performance-modal__disease-metrics">
+              <span><strong>Accuracy:</strong> {{ formatPercentage(disease.accuracy) }}</span>
+              <span><strong>Precision:</strong> {{ formatPercentage(disease.precision) }}</span>
+              <span><strong>Recall:</strong> {{ formatPercentage(disease.recall) }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ds-performance-modal__loading" *ngIf="isLoadingPerformance">
+      <p>Loading performance metrics...</p>
+    </div>
+  </div>
 </div>
 

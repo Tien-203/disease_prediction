@@ -1,6 +1,6 @@
 <div class="ds-dashboard">
   <section class="ds-dashboard__hero">
-    <h1 class="ds-dashboard__title">Welcome {{ displayName | titlecase }}</h1>
+    <h1 class="ds-dashboard__title">Welcome {{ displayName }}</h1>
     <p class="ds-dashboard__subtitle">Choose what to do</p>
 
     <div class="ds-dashboard__actions">
@@ -22,24 +22,6 @@
       &times;
     </button>
 
-    <div class="ds-progress">
-      <div
-        *ngFor="let stepName of addStepOrder; let idx = index"
-        class="ds-progress__step"
-        [ngClass]="{
-          'ds-progress__step--complete': idx < addStepOrder.indexOf(addStep),
-          'ds-progress__step--active': idx === addStepOrder.indexOf(addStep)
-        }"
-      >
-        <span class="ds-progress__badge">
-          <ng-container *ngIf="idx < addStepOrder.indexOf(addStep); else stepNumber">
-            ✓
-          </ng-container>
-          <ng-template #stepNumber>{{ idx + 1 }}</ng-template>
-        </span>
-      </div>
-    </div>
-
     <div class="ds-modal__body">
       <ng-container [ngSwitch]="addStep">
         <ng-container *ngSwitchCase="'name'">
@@ -52,44 +34,104 @@
           />
         </ng-container>
 
-        <ng-container *ngSwitchCase="'questions'">
-          <h2 class="ds-modal__title">Design the question flow</h2>
-          <p class="ds-modal__caption">Define the decision tree for the new disease.</p>
+        <ng-container *ngSwitchCase="'symptoms'">
+          <h2 class="ds-modal__title">Select symptom groups</h2>
+          <p class="ds-modal__caption">Choose the symptom groups associated with {{ addDiseaseName }}.</p>
 
-          <div class="ds-tree">
+          <div *ngIf="isLoadingGroups" class="ds-status">
+            <div class="ds-spinner"></div>
+            <p class="ds-status__label">Loading symptom groups...</p>
+          </div>
+
+          <div class="ds-tree" *ngIf="!isLoadingGroups">
             <div class="ds-tree__row ds-tree__row--root">
               <div class="ds-tree__node ds-tree__node--root">
-                Disease
+                {{ addDiseaseName || 'Disease' }}
               </div>
             </div>
+            
+            <!-- First row: 7 groups -->
             <div class="ds-tree__row">
-              <button
-                type="button"
-                class="ds-tree__node"
-                *ngFor="let question of addQuestions | slice:0:3; let idx = index"
-                [ngClass]="{ 'ds-tree__node--highlight': idx === addHighlightedQuestion }"
-                (click)="selectAddQuestion(idx)"
+              <div
+                *ngFor="let group of addSymptomGroups | slice:0:7; let idx = index"
+                class="ds-tree__group-container"
+                [ngClass]="{ 'ds-tree__group-container--expanded': group.expanded }"
               >
-                {{ question }}
-              </button>
+                <button
+                  type="button"
+                  class="ds-tree__node"
+                  [ngClass]="{ 
+                    'ds-tree__node--highlight': idx === addHighlightedGroup,
+                    'ds-tree__node--has-selection': group.selectedSymptoms.length > 0
+                  }"
+                  (click)="toggleSymptomGroup(idx, $event)"
+                  (mouseenter)="selectSymptomGroup(idx)"
+                >
+                  {{ formatGroupName(group.id) }}
+                  <span *ngIf="group.selectedSymptoms.length > 0" class="ds-tree__badge">
+                    {{ group.selectedSymptoms.length }}
+                  </span>
+                </button>
+                
+                <!-- Expanded symptoms list -->
+                <div class="ds-tree__symptoms" *ngIf="group.expanded">
+                  <div
+                    *ngFor="let symptom of group.options"
+                    class="ds-tree__symptom-item"
+                    [ngClass]="{ 'ds-tree__symptom-item--selected': isSymptomSelected(idx, symptom.id) }"
+                    (click)="toggleSymptomInGroup(idx, symptom.id); $event.stopPropagation()"
+                  >
+                    <span class="ds-tree__symptom-checkbox">
+                      <span *ngIf="isSymptomSelected(idx, symptom.id)">✓</span>
+                    </span>
+                    <span class="ds-tree__symptom-name">{{ symptom.display_name }}</span>
+                  </div>
+                </div>
+              </div>
             </div>
+            
+            <!-- Second row: 6 groups -->
             <div class="ds-tree__row">
-              <button
-                type="button"
-                class="ds-tree__node"
-                *ngFor="let question of addQuestions | slice:3; let idx = index"
-                [ngClass]="{ 'ds-tree__node--highlight': idx + 3 === addHighlightedQuestion }"
-                (click)="selectAddQuestion(idx + 3)"
+              <div
+                *ngFor="let group of addSymptomGroups | slice:7:13; let idx = index"
+                class="ds-tree__group-container"
+                [ngClass]="{ 'ds-tree__group-container--expanded': group.expanded }"
               >
-                {{ question }}
-              </button>
+                <button
+                  type="button"
+                  class="ds-tree__node"
+                  [ngClass]="{ 
+                    'ds-tree__node--highlight': idx + 7 === addHighlightedGroup,
+                    'ds-tree__node--has-selection': group.selectedSymptoms.length > 0
+                  }"
+                  (click)="toggleSymptomGroup(idx + 7)"
+                  (mouseenter)="selectSymptomGroup(idx + 7)"
+                >
+                  {{ formatGroupName(group.id) }}
+                  <span *ngIf="group.selectedSymptoms.length > 0" class="ds-tree__badge">
+                    {{ group.selectedSymptoms.length }}
+                  </span>
+                </button>
+                
+                <!-- Expanded symptoms list -->
+                <div class="ds-tree__symptoms" *ngIf="group.expanded">
+                  <div
+                    *ngFor="let symptom of group.options"
+                    class="ds-tree__symptom-item"
+                    [ngClass]="{ 'ds-tree__symptom-item--selected': isSymptomSelected(idx + 7, symptom.id) }"
+                    (click)="toggleSymptomInGroup(idx + 7, symptom.id)"
+                  >
+                    <span class="ds-tree__symptom-checkbox">
+                      <span *ngIf="isSymptomSelected(idx + 7, symptom.id)">✓</span>
+                    </span>
+                    <span class="ds-tree__symptom-name">{{ symptom.display_name }}</span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
-          <div class="ds-tree__actions">
-            <button type="button" class="ds-button ds-button--secondary" (click)="addNewQuestion()">
-              Add New Question
-            </button>
+          <div class="ds-tree__actions" *ngIf="!isLoadingGroups">
             <button type="button" class="ds-button ds-button--primary" (click)="continueAddWizard()">
               Save
             </button>
@@ -136,78 +178,133 @@
       &times;
     </button>
 
-    <div class="ds-progress">
-      <div
-        *ngFor="let stepName of modifyStepOrder; let idx = index"
-        class="ds-progress__step"
-        [ngClass]="{
-          'ds-progress__step--complete': idx < modifyStepOrder.indexOf(modifyStep),
-          'ds-progress__step--active': idx === modifyStepOrder.indexOf(modifyStep)
-        }"
-      >
-        <span class="ds-progress__badge">
-          <ng-container *ngIf="idx < modifyStepOrder.indexOf(modifyStep); else modifyNumber">
-            ✓
-          </ng-container>
-          <ng-template #modifyNumber>{{ idx + 1 }}</ng-template>
-        </span>
-      </div>
-    </div>
-
     <div class="ds-modal__body">
       <ng-container [ngSwitch]="modifyStep">
         <ng-container *ngSwitchCase="'search'">
           <h2 class="ds-modal__title">Choose disease to modify</h2>
+          <p class="ds-modal__caption">Enter the name of the disease you want to modify.</p>
           <div class="ds-search">
             <input
               type="text"
               class="ds-input"
-              placeholder="Search for disease"
+              placeholder="Enter disease name (e.g., Common Cold, Diabetes)"
               [(ngModel)]="modifySearch"
+              (keyup.enter)="continueModifyWizard()"
             />
             <button type="button" class="ds-button ds-button--primary" (click)="continueModifyWizard()">
-              Continue
+              Search
             </button>
+          </div>
+          <div *ngIf="modifyWizardError" class="ds-modal__error" role="alert">
+            {{ modifyWizardError }}
           </div>
         </ng-container>
 
-        <ng-container *ngSwitchCase="'questions'">
-          <h2 class="ds-modal__title">Adjust the question flow</h2>
+        <ng-container *ngSwitchCase="'symptoms'">
+          <h2 class="ds-modal__title">Adjust symptom groups</h2>
           <p class="ds-modal__caption">Selected disease: <strong>{{ selectedDisease }}</strong></p>
 
-          <div class="ds-tree">
+          <div *ngIf="isLoadingGroups" class="ds-status">
+            <div class="ds-spinner"></div>
+            <p class="ds-status__label">Loading symptom groups...</p>
+          </div>
+
+          <div class="ds-tree" *ngIf="!isLoadingGroups">
             <div class="ds-tree__row ds-tree__row--root">
               <div class="ds-tree__node ds-tree__node--root">
                 {{ selectedDisease || 'Disease' }}
               </div>
             </div>
+            
+            <!-- First row: 7 groups -->
             <div class="ds-tree__row">
-              <button
-                type="button"
-                class="ds-tree__node"
-                *ngFor="let question of modifyQuestions | slice:0:3; let idx = index"
-                [ngClass]="{ 'ds-tree__node--highlight': idx === modifyHighlightedQuestion }"
-                (click)="selectModifyQuestion(idx)"
+              <div
+                *ngFor="let group of modifySymptomGroups | slice:0:7; let idx = index"
+                class="ds-tree__group-container"
+                [ngClass]="{ 'ds-tree__group-container--expanded': group.expanded }"
               >
-                {{ question }}
-              </button>
+                <button
+                  type="button"
+                  class="ds-tree__node"
+                  [ngClass]="{ 
+                    'ds-tree__node--highlight': idx === modifyHighlightedGroup,
+                    'ds-tree__node--has-selection': group.selectedSymptoms.length > 0
+                  }"
+                  (click)="toggleModifySymptomGroup(idx, $event)"
+                  (mouseenter)="selectModifySymptomGroup(idx)"
+                >
+                  {{ formatGroupName(group.id) }}
+                  <span *ngIf="group.selectedSymptoms.length > 0" class="ds-tree__badge">
+                    {{ group.selectedSymptoms.length }}
+                  </span>
+                </button>
+                
+                <!-- Expanded symptoms list -->
+                <div class="ds-tree__symptoms" *ngIf="group.expanded">
+                  <div
+                    *ngFor="let symptom of group.options"
+                    class="ds-tree__symptom-item"
+                    [ngClass]="{ 'ds-tree__symptom-item--selected': isModifySymptomSelected(idx, symptom.id) }"
+                    (click)="toggleModifySymptomInGroup(idx, symptom.id); $event.stopPropagation()"
+                  >
+                    <span class="ds-tree__symptom-checkbox">
+                      <span *ngIf="isModifySymptomSelected(idx, symptom.id)">✓</span>
+                    </span>
+                    <span class="ds-tree__symptom-name">{{ symptom.display_name }}</span>
+                  </div>
+                </div>
+              </div>
             </div>
+            
+            <!-- Second row: 6 groups -->
             <div class="ds-tree__row">
-              <button
-                type="button"
-                class="ds-tree__node"
-                *ngFor="let question of modifyQuestions | slice:3; let idx = index"
-                [ngClass]="{ 'ds-tree__node--highlight': idx + 3 === modifyHighlightedQuestion }"
-                (click)="selectModifyQuestion(idx + 3)"
+              <div
+                *ngFor="let group of modifySymptomGroups | slice:7:13; let idx = index"
+                class="ds-tree__group-container"
+                [ngClass]="{ 'ds-tree__group-container--expanded': group.expanded }"
               >
-                {{ question }}
-              </button>
+                <button
+                  type="button"
+                  class="ds-tree__node"
+                  [ngClass]="{ 
+                    'ds-tree__node--highlight': idx + 7 === modifyHighlightedGroup,
+                    'ds-tree__node--has-selection': group.selectedSymptoms.length > 0
+                  }"
+                  (click)="toggleModifySymptomGroup(idx + 7)"
+                  (mouseenter)="selectModifySymptomGroup(idx + 7)"
+                >
+                  {{ formatGroupName(group.id) }}
+                  <span *ngIf="group.selectedSymptoms.length > 0" class="ds-tree__badge">
+                    {{ group.selectedSymptoms.length }}
+                  </span>
+                </button>
+                
+                <!-- Expanded symptoms list -->
+                <div class="ds-tree__symptoms" *ngIf="group.expanded">
+                  <div
+                    *ngFor="let symptom of group.options"
+                    class="ds-tree__symptom-item"
+                    [ngClass]="{ 'ds-tree__symptom-item--selected': isModifySymptomSelected(idx + 7, symptom.id) }"
+                    (click)="toggleModifySymptomInGroup(idx + 7, symptom.id)"
+                  >
+                    <span class="ds-tree__symptom-checkbox">
+                      <span *ngIf="isModifySymptomSelected(idx + 7, symptom.id)">✓</span>
+                    </span>
+                    <span class="ds-tree__symptom-name">{{ symptom.display_name }}</span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
-          <div class="ds-tree__actions">
-            <button type="button" class="ds-button ds-button--secondary" (click)="addModifyQuestion()">
-              Add New Question
+          <div class="ds-tree__actions" *ngIf="!isLoadingGroups">
+            <button 
+              type="button" 
+              class="ds-button ds-button--danger" 
+              (click)="confirmDeleteDisease()"
+              [disabled]="isDeleting"
+            >
+              Delete Disease
             </button>
             <button type="button" class="ds-button ds-button--primary" (click)="continueModifyWizard()">
               Save
@@ -238,6 +335,35 @@
     <div class="ds-modal__footer" *ngIf="modifyStep === 'success'">
       <button type="button" class="ds-button ds-button--primary" (click)="continueModifyWizard()">
         Close
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Confirmation Dialog -->
+<div class="ds-modal-overlay" *ngIf="showDeleteConfirmation">
+  <div class="ds-modal ds-modal--small">
+    <h2 class="ds-modal__title">Delete Disease</h2>
+    <p class="ds-modal__caption">
+      Are you sure you want to delete <strong>{{ selectedDisease }}</strong>?<br>
+      This action cannot be undone. The disease will be removed from the dataset, but symptoms will remain.
+    </p>
+    <div class="ds-modal__footer">
+      <button 
+        type="button" 
+        class="ds-button ds-button--secondary" 
+        (click)="cancelDelete()"
+        [disabled]="isDeleting"
+      >
+        Cancel
+      </button>
+      <button 
+        type="button" 
+        class="ds-button ds-button--danger" 
+        (click)="deleteDisease()"
+        [disabled]="isDeleting"
+      >
+        {{ isDeleting ? 'Deleting...' : 'Delete' }}
       </button>
     </div>
   </div>

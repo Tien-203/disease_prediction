@@ -1,0 +1,84 @@
+<div class="profile-page">
+  <div class="profile-container">
+    <h1 class="profile-title">Personal Information</h1>
+
+    <div *ngIf="error" class="profile-message profile-message--error" role="alert">
+      {{ error }}
+    </div>
+
+    <div *ngIf="success" class="profile-message profile-message--success" role="alert">
+      {{ success }}
+    </div>
+
+    <form class="profile-form" (ngSubmit)="onSubmit()" *ngIf="!loading">
+      <!-- Name Field -->
+      <div class="profile-form__field">
+        <label class="profile-form__label" for="name">Name</label>
+        <input
+          type="text"
+          id="name"
+          class="profile-form__input"
+          [(ngModel)]="name"
+          name="name"
+          placeholder="Enter your name"
+          [disabled]="saving"
+        />
+      </div>
+
+      <!-- Age Field -->
+      <div class="profile-form__field">
+        <label class="profile-form__label" for="age">Age</label>
+        <input
+          type="number"
+          id="age"
+          class="profile-form__input"
+          [(ngModel)]="age"
+          name="age"
+          placeholder="Enter your age"
+          min="0"
+          max="150"
+          [disabled]="saving"
+        />
+      </div>
+
+      <!-- Gender Field -->
+      <div class="profile-form__field">
+        <label class="profile-form__label">Gender</label>
+        <div class="profile-form__gender-options">
+          <label class="gender-option">
+            <input
+              type="radio"
+              name="gender"
+              value="male"
+              [(ngModel)]="gender"
+              [disabled]="saving"
+            />
+            <span class="gender-option__label">Male</span>
+          </label>
+          <label class="gender-option">
+            <input
+              type="radio"
+              name="gender"
+              value="female"
+              [(ngModel)]="gender"
+              [disabled]="saving"
+            />
+            <span class="gender-option__label">Female</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Save Button -->
+      <button type="submit" class="profile-form__button" [disabled]="saving">
+        <span *ngIf="!saving">Save</span>
+        <span *ngIf="saving">Saving...</span>
+      </button>
+    </form>
+
+    <div *ngIf="loading" class="profile-loading">
+      <p>Loading profile...</p>
+    </div>
+  </div>
+</div>
+
+

@@ -7,10 +7,3 @@ export const environment = {
   appName: 'Disease Prediction System',
   version: '1.0.0'
 };
-
-
-
-
-
-
-

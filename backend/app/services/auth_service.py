@@ -76,6 +76,19 @@ class AuthService:
         
         return user
     
+    def update_user(self, user: User, user_data: dict) -> User:
+        """Update user profile information"""
+        if "name" in user_data and user_data["name"] is not None:
+            user.name = user_data["name"]
+        if "age" in user_data and user_data["age"] is not None:
+            user.age = user_data["age"]
+        if "gender" in user_data and user_data["gender"] is not None:
+            user.gender = user_data["gender"]
+        
+        self.db.commit()
+        self.db.refresh(user)
+        return user
+    
     def to_user_response(self, user: User) -> UserResponse:
         """Convert User model to UserResponse schema"""
         return UserResponse(

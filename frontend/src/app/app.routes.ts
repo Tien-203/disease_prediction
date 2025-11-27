@@ -72,7 +72,17 @@ export const routes: Routes = [
     title: 'Data Scientist Home - Disease Prediction'
   },
   {
+    path: 'data-scientist/dashboard',
+    component: DataScientistDashboardComponent,
+    title: 'Data Scientist Home - Disease Prediction'
+  },
+  {
     path: 'ds/profile',
+    component: DataScientistProfileComponent,
+    title: 'Data Scientist Profile - Disease Prediction'
+  },
+  {
+    path: 'data-scientist/profile',
     component: DataScientistProfileComponent,
     title: 'Data Scientist Profile - Disease Prediction'
   },
@@ -80,6 +90,16 @@ export const routes: Routes = [
     path: 'ds/dataset',
     component: DataScientistDatasetComponent,
     title: 'Dataset - Disease Prediction'
+  },
+  {
+    path: 'data-scientist/dataset',
+    component: DataScientistDatasetComponent,
+    title: 'Dataset - Disease Prediction'
+  },
+  {
+    path: 'data-scientist/update',
+    component: DataScientistDashboardComponent,
+    title: 'Update - Disease Prediction'
   },
   {
     path: 'profile',

@@ -54,7 +54,7 @@ export class HomeComponent implements OnInit, AfterViewChecked {
     if (currentUser?.name) {
       this.userName = currentUser.name;
     } else if (currentUser?.email) {
-      this.userName = currentUser.email.split('@')[0];
+      this.userName = currentUser.email;
     }
   }
 
@@ -456,21 +456,4 @@ export class HomeComponent implements OnInit, AfterViewChecked {
     ];
   }
 
-  /**
-   * Navigate to record new disease page
-   */
-  navigateToRecordDisease(): void {
-    // Navigate to a page where users can record new diseases
-    // For now, we'll just show an alert or navigate to a placeholder
-    alert('Record new disease feature coming soon!');
-    // this.router.navigate(['/diseases/new']);
-  }
-
-  /**
-   * Navigate to record new disease from results modal
-   */
-  navigateToRecordDiseaseFromResults(): void {
-    this.closeResultsModal();
-    this.navigateToRecordDisease();
-  }
 }

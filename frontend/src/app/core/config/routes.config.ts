@@ -34,7 +34,7 @@ export const ROUTE_PATHS = {
 
   // Data Scientist routes
   DATA_SCIENTIST: {
-    HOME: '/data-scientist',
+    HOME: '/data-scientist/dashboard',
     DASHBOARD: '/data-scientist/dashboard',
     PROFILE: '/data-scientist/profile',
     DATASET: '/data-scientist/dataset',

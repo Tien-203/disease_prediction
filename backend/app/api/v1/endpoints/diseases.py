@@ -2,7 +2,8 @@
 import traceback
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.orm import Session
-from typing import Optional
+from typing import Optional, List
+from pydantic import BaseModel
 from loguru import logger
 
 from app.api.deps import get_db
@@ -13,8 +14,23 @@ from app.schemas.disease import (
     DiseaseListResponse
 )
 from app.services.disease_service import DiseaseService
+from app.services.dataset_service import DatasetService
 
 router = APIRouter()
+
+
+# Schema for saving disease with symptoms
+class DiseaseWithSymptomsCreate(BaseModel):
+    """Schema for creating disease with symptoms"""
+    disease_name: str
+    symptom_ids: List[int]
+    recommendation: Optional[str] = None
+
+
+class DiseaseWithSymptomsUpdate(BaseModel):
+    """Schema for updating disease with symptoms"""
+    symptom_ids: List[int]
+    recommendation: Optional[str] = None
 
 
 @router.get("", response_model=DiseaseListResponse)
@@ -168,13 +184,43 @@ def update_disease(
         )
 
 
+@router.delete("/by-name/{disease_name}", status_code=status.HTTP_200_OK)
+def delete_disease_by_name(
+    disease_name: str,
+    db: Session = Depends(get_db)
+):
+    """
+    Delete a disease from reference_data.json and CSV file
+    Does not delete the symptoms themselves
+    
+    Args:
+        disease_name: Name of the disease to delete (URL encoded)
+    """
+    try:
+        from urllib.parse import unquote
+        decoded_name = unquote(disease_name)
+        
+        dataset_service = DatasetService(db)
+        result = dataset_service.delete_disease(decoded_name)
+        return result
+    except HTTPException:
+        raise
+    except Exception as e:
+        traceback_str = traceback.format_exc()
+        logger.error(f"Error deleting disease: {str(e)}\n{traceback_str}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error deleting disease: {str(e)}"
+        )
+
+
 @router.delete("/{disease_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_disease(
     disease_id: int,
     db: Session = Depends(get_db)
 ):
     """
-    Delete a disease
+    Delete a disease by ID
     
     Args:
         disease_id: Disease ID
@@ -197,4 +243,122 @@ def delete_disease(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error deleting disease: {str(e)}"
         )
+
+
+@router.post("/with-symptoms", status_code=status.HTTP_201_CREATED)
+def create_disease_with_symptoms(
+    disease_data: DiseaseWithSymptomsCreate,
+    db: Session = Depends(get_db)
+):
+    """
+    Create a new disease with symptoms and save to reference_data.json and CSV
+    
+    Args:
+        disease_data: Disease name, symptom IDs, and optional recommendation
+    """
+    try:
+        dataset_service = DatasetService(db)
+        result = dataset_service.add_disease_with_symptoms(
+            disease_name=disease_data.disease_name,
+            symptom_ids=disease_data.symptom_ids,
+            recommendation=disease_data.recommendation
+        )
+        return result
+    except HTTPException:
+        raise
+    except Exception as e:
+        traceback_str = traceback.format_exc()
+        logger.error(f"Error creating disease with symptoms: {str(e)}\n{traceback_str}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error creating disease with symptoms: {str(e)}"
+        )
+
+
+@router.get("/{disease_name}/symptoms", status_code=status.HTTP_200_OK)
+def get_disease_symptoms(
+    disease_name: str,
+    db: Session = Depends(get_db)
+):
+    """
+    Get symptoms for a disease from CSV file
+    
+    Args:
+        disease_name: Name of the disease (URL encoded)
+    """
+    try:
+        from urllib.parse import unquote
+        decoded_name = unquote(disease_name)
+        
+        dataset_service = DatasetService(db)
+        result = dataset_service.get_disease_symptoms(decoded_name)
+        
+        if not result:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Disease '{decoded_name}' not found in dataset"
+            )
+        
+        # Get symptom IDs from symptom names
+        from app.models.symptom import Symptom
+        symptoms = db.query(Symptom).filter(Symptom.name.in_(result['symptom_names'])).all()
+        symptom_ids = [s.id for s in symptoms]
+        found_names = {s.name for s in symptoms}
+        missing_names = set(result['symptom_names']) - found_names
+        
+        if missing_names:
+            logger.warning(f"Some symptom names from CSV not found in database: {missing_names}")
+        
+        return {
+            "disease_name": result['disease_name'],
+            "symptom_names": result['symptom_names'],
+            "symptom_ids": symptom_ids,
+            "missing_symptoms": list(missing_names) if missing_names else []
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        traceback_str = traceback.format_exc()
+        logger.error(f"Error getting disease symptoms: {str(e)}\n{traceback_str}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error getting disease symptoms: {str(e)}"
+        )
+
+
+@router.put("/{disease_name}/symptoms", status_code=status.HTTP_200_OK)
+def update_disease_symptoms(
+    disease_name: str,
+    disease_data: DiseaseWithSymptomsUpdate,
+    db: Session = Depends(get_db)
+):
+    """
+    Update an existing disease's symptoms and save to CSV
+    
+    Args:
+        disease_name: Name of the disease to update (URL encoded)
+        disease_data: Symptom IDs and optional recommendation
+    """
+    try:
+        from urllib.parse import unquote
+        decoded_name = unquote(disease_name)
+        
+        dataset_service = DatasetService(db)
+        result = dataset_service.update_disease_symptoms(
+            disease_name=decoded_name,
+            symptom_ids=disease_data.symptom_ids,
+            recommendation=disease_data.recommendation
+        )
+        return result
+    except HTTPException:
+        raise
+    except Exception as e:
+        traceback_str = traceback.format_exc()
+        logger.error(f"Error updating disease symptoms: {str(e)}\n{traceback_str}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error updating disease symptoms: {str(e)}"
+        )
+
+
 

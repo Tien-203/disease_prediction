@@ -26,7 +26,7 @@ export class DoctorDashboardComponent implements OnInit {
     if (currentUser?.name) {
       this.displayName = currentUser.name;
     } else if (currentUser?.email) {
-      this.displayName = currentUser.email.split('@')[0];
+      this.displayName = currentUser.email;
     }
   }
 

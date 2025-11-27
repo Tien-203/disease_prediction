@@ -5,13 +5,16 @@ from sqlalchemy.orm import Session
 from datetime import timedelta
 from loguru import logger
 
-from app.api.deps import get_db
+from app.api.deps import get_db, get_current_user
 from app.schemas.auth import (
     UserLogin,
     UserCreate,
     AuthResponse,
-    Token
+    Token,
+    UserResponse,
+    UserUpdate
 )
+from app.models.user import User
 from app.services.auth_service import AuthService
 from app.core.security import create_access_token
 from app.core.config import settings
@@ -128,6 +131,64 @@ def register(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error during registration: {str(e)}"
+        )
+
+
+@router.get("/me", response_model=UserResponse)
+def get_current_user_profile(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Get current user profile
+    
+    Args:
+        current_user: Current authenticated user
+        db: Database session
+        
+    Returns:
+        Current user information
+    """
+    auth_service = AuthService(db)
+    return auth_service.to_user_response(current_user)
+
+
+@router.put("/me", response_model=UserResponse)
+def update_current_user_profile(
+    user_update: UserUpdate,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Update current user profile
+    
+    Args:
+        user_update: User profile update data
+        current_user: Current authenticated user
+        db: Database session
+        
+    Returns:
+        Updated user information
+    """
+    try:
+        auth_service = AuthService(db)
+        
+        # Convert Pydantic model to dict, excluding None values
+        update_data = user_update.model_dump(exclude_unset=True)
+        
+        # Update user
+        updated_user = auth_service.update_user(current_user, update_data)
+        
+        # Return updated user
+        return auth_service.to_user_response(updated_user)
+    except HTTPException:
+        raise
+    except Exception as e:
+        traceback_str = traceback.format_exc()
+        logger.error(f"Error updating user profile: {str(e)}\n{traceback_str}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error updating profile: {str(e)}"
         )
 
 

@@ -3,6 +3,28 @@
     <h1>Prediction tracking</h1>
   </header>
 
+  <!-- Date Range Filters -->
+  <div class="history-filters" *ngIf="!isLoading && !error">
+    <div class="date-filter">
+      <label class="date-filter__label">From</label>
+      <input
+        type="date"
+        class="date-filter__input"
+        [(ngModel)]="dateFrom"
+        (change)="onDateFilterChange()"
+      />
+    </div>
+    <div class="date-filter">
+      <label class="date-filter__label">To</label>
+      <input
+        type="date"
+        class="date-filter__input"
+        [(ngModel)]="dateTo"
+        (change)="onDateFilterChange()"
+      />
+    </div>
+  </div>
+
   <section *ngIf="isLoading" class="history-state">
     <div class="spinner"></div>
     <p>Loading your previous predictions...</p>
@@ -12,37 +34,109 @@
     {{ error }}
   </section>
 
-  <section *ngIf="!isLoading && !error && records.length === 0" class="history-state">
+  <section *ngIf="!isLoading && !error && filteredRecords.length === 0" class="history-state">
     You don't have any predictions yet. Start a new quick check to see your history here.
   </section>
 
-  <div class="history-list" *ngIf="records.length > 0">
-    <article class="history-card" *ngFor="let record of records">
-      <div class="history-card__section">
+  <div class="history-list" *ngIf="filteredRecords.length > 0">
+    <article 
+      class="history-card" 
+      *ngFor="let record of filteredRecords"
+      (click)="openRecordModal(record)">
+      <div class="history-card__column">
         <span class="history-card__label">Date</span>
         <span class="history-card__value">{{ formatDate(record.timestamp) }}</span>
       </div>
-      <div class="history-card__section">
+      <div class="history-card__column">
         <span class="history-card__label">Prediction result</span>
-        <div class="history-card__value history-card__value--stack">
-          <span class="history-card__disease">{{ record.predicted_disease }}</span>
-          <span class="history-card__confidence">
-            Confidence · {{ (record.confidence * 100) | number:'1.0-0' }}%
-          </span>
-          <span class="history-card__symptoms">
-            Symptoms: {{ record.symptoms.join(', ') }}
-          </span>
-        </div>
+        <span class="history-card__value">{{ record.predicted_disease }}</span>
       </div>
-      <div class="history-card__section">
+      <div class="history-card__column">
+        <span class="history-card__label">Disease description</span>
+        <span class="history-card__value">{{ getDiseaseDescription(record) }}</span>
+      </div>
+      <div class="history-card__column">
+        <span class="history-card__label">Symptoms</span>
+        <ul class="history-card__list">
+          <li *ngFor="let symptom of record.symptoms.slice(0, 3)">{{ symptom }}</li>
+        </ul>
+      </div>
+      <div class="history-card__column">
         <span class="history-card__label">Recommendations</span>
         <ul class="history-card__list">
-          <li *ngFor="let tip of generateRecommendations(record)">
-            {{ tip }}
+          <li *ngFor="let rec of getRecommendationsForRecord(record).slice(0, 3)">
+            {{ rec }}
           </li>
         </ul>
       </div>
     </article>
+  </div>
+</div>
+
+<!-- Results Modal (similar to home component) -->
+<div class="modal-overlay" *ngIf="showResultsModal" (click)="closeResultsModal()">
+  <div class="modal-content modal-content--results" (click)="$event.stopPropagation()">
+    <button class="modal-close" (click)="closeResultsModal()">×</button>
+    
+    <!-- Progress Indicator -->
+    <div class="results-progress">
+      <div class="progress-step completed">
+        <div class="step-circle">
+          <span class="step-check">✓</span>
+        </div>
+      </div>
+      <div class="progress-line completed"></div>
+      <div class="progress-step completed">
+        <div class="step-circle">
+          <span class="step-check">✓</span>
+        </div>
+      </div>
+      <div class="progress-line completed"></div>
+      <div class="progress-step completed">
+        <div class="step-circle">
+          <span class="step-check">✓</span>
+        </div>
+      </div>
+      <div class="progress-line completed"></div>
+      <div class="progress-step completed">
+        <div class="step-circle">
+          <span class="step-check">✓</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Loading State (shown during processing) -->
+    <div class="results-loading" *ngIf="isLoadingDiseaseInfo">
+      <div class="loading-spinner"></div>
+      <p class="loading-text">Loading prediction details</p>
+    </div>
+
+    <!-- Results Content -->
+    <div class="results-content" #resultsContent *ngIf="!isLoadingDiseaseInfo && selectedRecord">
+      <!-- Possible Conditions -->
+      <div class="results-section">
+        <h2 class="results-section-title">Here is your Possible Conditions</h2>
+        <div class="disease-list">
+          <div 
+            *ngFor="let pred of allPredictions" 
+            class="disease-item">
+            <div class="disease-name">{{ pred.disease }}</div>
+            <div class="disease-separator">|</div>
+            <div class="disease-confidence">{{ (pred.confidence * 100).toFixed(0) }}%</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recommendations -->
+      <div class="results-section">
+        <h2 class="results-section-title">Our Recommendations</h2>
+        <ul class="recommendations-list">
+          <li *ngFor="let rec of getRecommendations()" class="recommendation-item">
+            {{ rec }}
+          </li>
+        </ul>
+      </div>
+    </div>
   </div>
 </div>
 

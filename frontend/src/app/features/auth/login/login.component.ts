@@ -118,7 +118,8 @@ export class LoginComponent implements OnInit, OnDestroy {
     let targetRoute: string[] = ['/patient'];
     switch (normalizedRole) {
       case 'data_scientist':
-        targetRoute = ['/ds'];
+      case 'datascientist':
+        targetRoute = ['/data-scientist/dashboard'];
         break;
       case 'doctor':
         targetRoute = ['/doctor'];

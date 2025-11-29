@@ -1,4 +1,4 @@
-.doctor-patients {
+.researcher-patients {
   min-height: calc(100vh - 160px);
   background-color: #f5f9e9;
   padding: 40px 32px;
@@ -6,7 +6,7 @@
   justify-content: center;
 }
 
-.doctor-patients__card {
+.researcher-patients__card {
   width: 100%;
   max-width: 1400px;
   padding: 40px 48px;
@@ -16,7 +16,7 @@
   box-shadow: 0 4px 16px rgba(16, 45, 36, 0.06);
 }
 
-.doctor-patients__title {
+.researcher-patients__title {
   margin: 0 0 32px;
   font-size: 28px;
   color: #111827;
@@ -24,7 +24,7 @@
   letter-spacing: -0.5px;
 }
 
-.doctor-patients__filters {
+.researcher-patients__filters {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -33,7 +33,7 @@
   margin-bottom: 36px;
 }
 
-.doctor-patients__search {
+.researcher-patients__search {
   position: relative;
   display: flex;
   align-items: center;
@@ -64,7 +64,7 @@
   }
 }
 
-.doctor-patients__search-icon {
+.researcher-patients__search-icon {
   position: absolute;
   left: 14px;
   font-size: 16px;
@@ -72,13 +72,13 @@
   pointer-events: none;
 }
 
-.doctor-patients__date-group {
+.researcher-patients__date-group {
   display: flex;
   gap: 16px;
   flex-wrap: wrap;
 }
 
-.doctor-patients__export {
+.researcher-patients__export {
   padding: 10px 20px;
   border-radius: 8px;
   border: 1px solid #e5e7eb;
@@ -98,13 +98,13 @@
   }
 }
 
-.doctor-patients__list {
+.researcher-patients__list {
   display: flex;
   flex-direction: column;
   gap: 16px;
 }
 
-.doctor-patients__item {
+.researcher-patients__item {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   gap: 20px;
@@ -123,14 +123,14 @@
   }
 }
 
-.doctor-patients__column {
+.researcher-patients__column {
   display: flex;
   flex-direction: column;
   gap: 8px;
   min-width: 0; // Allow text truncation
 }
 
-.doctor-patients__label {
+.researcher-patients__label {
   font-size: 12px;
   color: #6b7280;
   font-weight: 500;
@@ -138,7 +138,7 @@
   letter-spacing: 0.5px;
 }
 
-.doctor-patients__value {
+.researcher-patients__value {
   font-size: 14px;
   color: #1f2937;
   font-weight: 500;
@@ -146,7 +146,7 @@
   word-wrap: break-word;
 }
 
-.doctor-patients__diseases {
+.researcher-patients__diseases {
   margin: 0;
   padding-left: 0;
   display: flex;
@@ -157,13 +157,13 @@
   list-style: none;
 }
 
-.doctor-patients__diseases li {
+.researcher-patients__diseases li {
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
-.doctor-patients__disease-indicator {
+.researcher-patients__disease-indicator {
   font-weight: bold;
   font-size: 18px;
   width: 20px;
@@ -171,15 +171,15 @@
   text-align: center;
 }
 
-.doctor-patients__disease--correct .doctor-patients__disease-indicator {
+.researcher-patients__disease--correct .researcher-patients__disease-indicator {
   color: #10b981;
 }
 
-.doctor-patients__disease--incorrect .doctor-patients__disease-indicator {
+.researcher-patients__disease--incorrect .researcher-patients__disease-indicator {
   color: #ef4444;
 }
 
-.doctor-patients__actual-result {
+.researcher-patients__actual-result {
   display: inline-block;
   padding: 8px 16px;
   background-color: #102d24;
@@ -189,7 +189,7 @@
   font-weight: 600;
 }
 
-.doctor-patients__recommendation {
+.researcher-patients__recommendation {
   max-height: 100px;
   overflow-y: auto;
   padding-right: 6px;
@@ -213,7 +213,7 @@
   }
 }
 
-.doctor-patients__recommendation-text {
+.researcher-patients__recommendation-text {
   font-size: 13px;
   color: #374151;
   font-weight: 400;
@@ -222,19 +222,19 @@
   word-wrap: break-word;
 }
 
-.doctor-patients__value--muted {
+.researcher-patients__value--muted {
   color: #9ca3af;
   font-style: normal;
   font-weight: 400;
 }
 
-.doctor-patients__column--correction {
+.researcher-patients__column--correction {
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
 
-.doctor-patients__column--correction .doctor-patients__value {
+.researcher-patients__column--correction .researcher-patients__value {
   font-size: 13px;
   color: #059669;
   font-weight: 500;
@@ -245,14 +245,14 @@
   width: fit-content;
 }
 
-.doctor-patients__column--action {
+.researcher-patients__column--action {
   position: absolute;
   top: 20px;
   right: 28px;
   z-index: 10;
 }
 
-.doctor-patients__correct-button {
+.researcher-patients__correct-button {
   padding: 8px 16px;
   border-radius: 8px;
   border: none;
@@ -280,7 +280,7 @@
   }
 }
 
-.doctor-patients__correct-button--corrected {
+.researcher-patients__correct-button--corrected {
   background: linear-gradient(135deg, #10b981 0%, #059669 100%);
   box-shadow: 0 2px 4px rgba(16, 185, 129, 0.25);
 
@@ -290,12 +290,12 @@
   }
 }
 
-.doctor-patients__correct-icon {
+.researcher-patients__correct-icon {
   font-size: 14px;
   font-weight: bold;
 }
 
-.doctor-modal-overlay {
+.researcher-modal-overlay {
   position: fixed;
   inset: 0;
   background-color: rgba(16, 45, 36, 0.25);
@@ -308,7 +308,7 @@
   overflow-y: auto;
 }
 
-.doctor-modal {
+.researcher-modal {
   position: relative;
   width: 100%;
   max-width: 420px;
@@ -320,7 +320,7 @@
   box-shadow: 0 28px 60px rgba(16, 45, 36, 0.22);
 }
 
-.doctor-modal__close {
+.researcher-modal__close {
   position: absolute;
   top: 20px;
   right: 26px;
@@ -331,7 +331,7 @@
   cursor: pointer;
 }
 
-.doctor-modal__chips {
+.researcher-modal__chips {
   display: flex;
   gap: 12px;
   flex-wrap: wrap;
@@ -386,14 +386,14 @@
   }
 }
 
-.doctor-calendar {
+.researcher-calendar {
   background-color: #ffffff;
   border-radius: 16px;
   padding: 16px;
   box-shadow: inset 0 0 0 1px rgba(16, 45, 36, 0.08);
 }
 
-.doctor-calendar__header {
+.researcher-calendar__header {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -402,7 +402,7 @@
   color: #123225;
 }
 
-.doctor-calendar__nav button {
+.researcher-calendar__nav button {
   border: none;
   background: none;
   font-size: 24px;
@@ -423,13 +423,13 @@
   }
 }
 
-.doctor-calendar__grid {
+.researcher-calendar__grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   gap: 8px;
 }
 
-.doctor-calendar__cell {
+.researcher-calendar__cell {
   border: none;
   background: none;
   height: 32px;
@@ -449,25 +449,25 @@
   }
 }
 
-.doctor-calendar__cell--selected {
+.researcher-calendar__cell--selected {
   background-color: #0f2d24 !important;
   color: #f5f9ee !important;
   font-weight: 600;
 }
 
-.doctor-calendar__cell--other-month {
+.researcher-calendar__cell--other-month {
   opacity: 0.3;
   cursor: not-allowed;
 }
 
-.doctor-modal__actions {
+.researcher-modal__actions {
   display: flex;
   gap: 12px;
   margin-top: 20px;
   justify-content: flex-end;
 }
 
-.doctor-modal__button {
+.researcher-modal__button {
   padding: 10px 20px;
   border-radius: 12px;
   border: none;
@@ -477,7 +477,7 @@
   transition: all 0.2s ease;
 }
 
-.doctor-modal__button--primary {
+.researcher-modal__button--primary {
   background-color: #0f2d24;
   color: #f5f9ee;
   box-shadow: 0 4px 12px rgba(16, 45, 36, 0.2);
@@ -489,7 +489,7 @@
   }
 }
 
-.doctor-modal__button--secondary {
+.researcher-modal__button--secondary {
   background-color: #c9ea74;
   color: #123225;
   box-shadow: 0 4px 12px rgba(201, 234, 116, 0.2);
@@ -501,50 +501,50 @@
   }
 }
 
-.doctor-calendar__cell--muted {
+.researcher-calendar__cell--muted {
   font-size: 13px;
   color: rgba(16, 45, 36, 0.4);
 }
 
 @media (max-width: 1400px) {
-  .doctor-patients__item {
+  .researcher-patients__item {
     grid-template-columns: repeat(4, 1fr);
   }
 }
 
 @media (max-width: 1024px) {
-  .doctor-patients__item {
+  .researcher-patients__item {
     grid-template-columns: repeat(2, 1fr);
   }
 }
 
 @media (max-width: 720px) {
-  .doctor-patients {
+  .researcher-patients {
     padding: 72px 20px;
   }
 
-  .doctor-patients__card {
+  .researcher-patients__card {
     padding: 48px 24px;
   }
 
-  .doctor-patients__filters {
+  .researcher-patients__filters {
     flex-direction: column;
     align-items: stretch;
   }
 
-  .doctor-patients__item {
+  .researcher-patients__item {
     grid-template-columns: 1fr;
   }
 }
 
-.doctor-patients__loading {
+.researcher-patients__loading {
   text-align: center;
   padding: 60px 20px;
   color: #6b7280;
   font-size: 16px;
 }
 
-.doctor-patients__empty {
+.researcher-patients__empty {
   text-align: center;
   padding: 60px 20px;
   color: #9ca3af;

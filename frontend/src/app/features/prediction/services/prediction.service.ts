@@ -4,7 +4,9 @@ import { ApiService } from '../../../core/services/api.service';
 import {
   PredictionRequest,
   PredictionResponse,
-  PredictionHistory
+  PredictionHistory,
+  PatientPrediction,
+  PredictionUpdateRequest
 } from '../models/prediction.model';
 import { SymptomListResponse, SymptomGroupsResponse } from '../models/symptom.model';
 
@@ -44,6 +46,20 @@ export class PredictionService {
    */
   getPredictionHistory(skip: number = 0, limit: number = 10): Observable<{ predictions: PredictionHistory[]; total: number }> {
     return this.apiService.get<{ predictions: PredictionHistory[]; total: number }>('/predict/history', { skip, limit });
+  }
+
+  /**
+   * Get all patient predictions with user info (for doctors)
+   */
+  getAllPatientPredictions(skip: number = 0, limit: number = 100): Observable<PatientPrediction[]> {
+    return this.apiService.get<PatientPrediction[]>('/predict/patients/all', { skip, limit });
+  }
+
+  /**
+   * Correct/update prediction with actual disease (for doctors)
+   */
+  correctPrediction(predictionId: number, request: PredictionUpdateRequest): Observable<PredictionHistory> {
+    return this.apiService.put<PredictionHistory>(`/predict/${predictionId}/correct`, request);
   }
 
   /**

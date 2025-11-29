@@ -43,6 +43,30 @@ class PredictionHistoryResponse(BaseModel):
     confidence: float
     timestamp: datetime
     session_id: Optional[str]
+    corrected_disease: Optional[str] = None
+    
+    class Config:
+        from_attributes = True
+
+
+class PredictionUpdateRequest(BaseModel):
+    """Schema for updating prediction (correcting disease)"""
+    corrected_disease: str = Field(..., description="Corrected/actual disease name")
+
+
+class PatientPredictionResponse(BaseModel):
+    """Schema for patient prediction with user info (for doctors)"""
+    id: int
+    user_id: Optional[int]
+    user_name: Optional[str]
+    user_age: Optional[int]
+    user_gender: Optional[str]
+    symptoms: List[str]
+    predicted_disease: str
+    confidence: float
+    timestamp: datetime
+    corrected_disease: Optional[str] = None
+    recommendation: Optional[str] = None
     
     class Config:
         from_attributes = True

@@ -15,15 +15,6 @@ class OverallMetrics(BaseModel):
     f1_std: Optional[float] = None
 
 
-class DiseasePerformance(BaseModel):
-    """Performance metrics for a specific disease"""
-    disease: str
-    accuracy: float
-    precision: float
-    recall: float
-    f1_score: Optional[float] = None
-
-
 class ModelPerformanceResponse(BaseModel):
     """Model performance response schema"""
     model_type: str
@@ -32,6 +23,6 @@ class ModelPerformanceResponse(BaseModel):
     n_features: int
     n_classes: int
     overall_metrics: OverallMetrics
-    per_disease_performance: List[DiseasePerformance]
     feature_importance: List[dict]
+
 

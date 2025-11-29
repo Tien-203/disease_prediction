@@ -1,11 +1,14 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Subject, takeUntil } from 'rxjs';
+import { ApiService } from '../../core/services/api.service';
+import * as XLSX from 'xlsx';
 
 interface ResearcherDatasetRecord {
-  dateModified: string;
+  date_modified: string;
   disease: string;
-  questions: string[];
+  symptoms: string[];
 }
 
 /**
@@ -18,31 +21,23 @@ interface ResearcherDatasetRecord {
   templateUrl: './researcher-dataset.component.html',
   styleUrls: ['./researcher-dataset.component.scss']
 })
-export class ResearcherDatasetComponent {
+export class ResearcherDatasetComponent implements OnInit, OnDestroy {
   searchTerm = '';
-  fromDate = 'Oct 12, 2021';
-  toDate = 'Oct 17, 2021';
+  records: ResearcherDatasetRecord[] = [];
+  isLoading = false;
+  
+  private destroy$ = new Subject<void>();
 
-  dateModalOpen = false;
-  activeDatePicker: 'from' | 'to' | null = null;
+  constructor(private apiService: ApiService) {}
 
-  readonly records: ResearcherDatasetRecord[] = [
-    {
-      dateModified: 'Oct 17, 2021',
-      disease: 'Influenza',
-      questions: ['Temperature check', 'Travel history', 'Vaccination status']
-    },
-    {
-      dateModified: 'Oct 15, 2021',
-      disease: 'Diabetes Type II',
-      questions: ['Blood sugar average', 'Medication adherence', 'Lifestyle notes']
-    },
-    {
-      dateModified: 'Oct 12, 2021',
-      disease: 'Hypertension',
-      questions: ['BP readings', 'Diet tracking', 'Stress level']
-    }
-  ];
+  ngOnInit(): void {
+    this.loadDataset();
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 
   get filteredRecords(): ResearcherDatasetRecord[] {
     const term = this.searchTerm.trim().toLowerCase();
@@ -51,22 +46,50 @@ export class ResearcherDatasetComponent {
     }
     return this.records.filter((record) =>
       record.disease.toLowerCase().includes(term) ||
-      record.questions.some(question => question.toLowerCase().includes(term))
+      record.symptoms.some(symptom => symptom.toLowerCase().includes(term))
     );
   }
 
-  openDateModal(type: 'from' | 'to'): void {
-    this.activeDatePicker = type;
-    this.dateModalOpen = true;
-  }
-
-  closeDateModal(): void {
-    this.dateModalOpen = false;
-    this.activeDatePicker = null;
+  loadDataset(): void {
+    this.isLoading = true;
+    this.apiService.get<{ records: ResearcherDatasetRecord[]; total: number }>('/dataset/records')
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response: { records: ResearcherDatasetRecord[]; total: number }) => {
+          this.records = response.records;
+          this.isLoading = false;
+        },
+        error: (error: any) => {
+          console.error('Error loading dataset:', error);
+          this.isLoading = false;
+        }
+      });
   }
 
   exportDataset(): void {
-    // Placeholder for export action
+    try {
+      // Prepare data for export
+      const exportData = this.filteredRecords.map(record => ({
+        'Date Modified': record.date_modified,
+        'Disease': record.disease,
+        'Symptoms': record.symptoms.join(', ')
+      }));
+
+      // Create workbook and worksheet
+      const ws = XLSX.utils.json_to_sheet(exportData);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'Dataset');
+
+      // Generate filename with current date
+      const date = new Date().toISOString().split('T')[0];
+      const filename = `dataset_export_${date}.xlsx`;
+
+      // Write file
+      XLSX.writeFile(wb, filename);
+    } catch (error) {
+      console.error('Error exporting dataset:', error);
+      alert('Failed to export dataset. Please try again.');
+    }
   }
 }
 

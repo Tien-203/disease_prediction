@@ -33,5 +33,24 @@ export interface PredictionHistory {
   confidence: number;
   timestamp: string;
   session_id?: string;
+  corrected_disease?: string;
+}
+
+export interface PatientPrediction {
+  id: number;
+  user_id?: number;
+  user_name?: string;
+  user_age?: number;
+  user_gender?: string;
+  symptoms: string[];
+  predicted_disease: string;
+  confidence: number;
+  timestamp: string;
+  corrected_disease?: string;
+  recommendation?: string;
+}
+
+export interface PredictionUpdateRequest {
+  corrected_disease: string;
 }
 

@@ -1,0 +1,223 @@
+<div class="researcher-patients">
+  <section class="researcher-patients__card">
+    <h1 class="researcher-patients__title">Patient Log</h1>
+
+    <div class="researcher-patients__filters">
+      <div class="researcher-patients__search">
+        <span class="researcher-patients__search-icon">🔍</span>
+        <input
+          type="text"
+          placeholder="Search for patient"
+          [(ngModel)]="searchTerm"
+        />
+      </div>
+
+      <div class="researcher-patients__date-group">
+        <button type="button" class="doc-chip" (click)="openDateModal('from')">
+          <span>From</span>
+          <strong>{{ fromDateDisplay }}</strong>
+        </button>
+        <button type="button" class="doc-chip" (click)="openDateModal('to')">
+          <span>To</span>
+          <strong>{{ toDateDisplay }}</strong>
+        </button>
+        <button 
+          type="button" 
+          class="doc-chip" 
+          (click)="clearDateFilters()"
+          *ngIf="fromDate || toDate"
+          title="Clear date filters"
+        >
+          Clear
+        </button>
+      </div>
+
+      <button type="button" class="researcher-patients__export" (click)="exportPatients()">
+        Export
+      </button>
+    </div>
+
+    <div *ngIf="loading" class="researcher-patients__loading">
+      <p>Loading patient records...</p>
+    </div>
+
+    <div class="researcher-patients__list" *ngIf="!loading">
+      <article class="researcher-patients__item" *ngFor="let record of filteredRecords">
+        <div class="researcher-patients__column researcher-patients__column--action">
+          <button 
+            type="button" 
+            class="researcher-patients__correct-button"
+            (click)="openCorrectModal(record)"
+            [class.researcher-patients__correct-button--corrected]="record.corrected_disease"
+          >
+            <span class="researcher-patients__correct-icon" *ngIf="record.corrected_disease">✓</span>
+            <span>{{ record.corrected_disease ? 'Update' : 'Correct' }}</span>
+          </button>
+        </div>
+        <div class="researcher-patients__column">
+          <span class="researcher-patients__label">Date</span>
+          <span class="researcher-patients__value">{{ formatDate(record.timestamp) }}</span>
+        </div>
+        <div class="researcher-patients__column">
+          <span class="researcher-patients__label">Name</span>
+          <span class="researcher-patients__value">{{ record.user_name || 'N/A' }}</span>
+        </div>
+        <div class="researcher-patients__column">
+          <span class="researcher-patients__label">Age</span>
+          <span class="researcher-patients__value">{{ record.user_age || 'N/A' }}</span>
+        </div>
+        <div class="researcher-patients__column">
+          <span class="researcher-patients__label">Gender</span>
+          <span class="researcher-patients__value">{{ record.user_gender || 'N/A' }}</span>
+        </div>
+        <div class="researcher-patients__column">
+          <span class="researcher-patients__label">Prediction</span>
+          <span class="researcher-patients__value">{{ record.predicted_disease }}</span>
+        </div>
+        <div class="researcher-patients__column">
+          <span class="researcher-patients__label">Recommendation</span>
+          <div class="researcher-patients__recommendation">
+            <div class="researcher-patients__recommendation-text" *ngIf="record.recommendation; else noRecommendation">
+              {{ record.recommendation }}
+            </div>
+            <ng-template #noRecommendation>
+              <span class="researcher-patients__value researcher-patients__value--muted">No recommendation available</span>
+            </ng-template>
+          </div>
+        </div>
+        <div class="researcher-patients__column researcher-patients__column--correction">
+          <span class="researcher-patients__label">Correction</span>
+          <span class="researcher-patients__value" *ngIf="record.corrected_disease; else noCorrection">
+            {{ record.corrected_disease }}
+          </span>
+          <ng-template #noCorrection>
+            <span class="researcher-patients__value researcher-patients__value--muted">—</span>
+          </ng-template>
+        </div>
+      </article>
+    </div>
+
+    <div *ngIf="!loading && filteredRecords.length === 0" class="researcher-patients__empty">
+      <p>No patient records found.</p>
+    </div>
+  </section>
+</div>
+
+<div class="researcher-modal-overlay" *ngIf="dateModalOpen" (click)="closeDateModal()">
+  <div class="researcher-modal" (click)="$event.stopPropagation()">
+    <button type="button" class="researcher-modal__close" aria-label="Close date picker" (click)="closeDateModal()">
+      &times;
+    </button>
+
+    <div class="researcher-modal__chips">
+      <button
+        type="button"
+        class="doc-chip"
+        [class.doc-chip--active]="activeDatePicker === 'from'"
+        (click)="activeDatePicker = 'from'"
+      >
+        <span>From</span>
+        <strong>{{ fromDateDisplay }}</strong>
+      </button>
+      <button
+        type="button"
+        class="doc-chip"
+        [class.doc-chip--active]="activeDatePicker === 'to'"
+        (click)="activeDatePicker = 'to'"
+      >
+        <span>To</span>
+        <strong>{{ toDateDisplay }}</strong>
+      </button>
+    </div>
+
+    <div class="researcher-calendar">
+      <header class="researcher-calendar__header">
+        <span>{{ getCurrentMonthName() }}</span>
+        <div class="researcher-calendar__nav">
+          <button type="button" (click)="previousMonth()" aria-label="Previous month">‹</button>
+          <button type="button" (click)="nextMonth()" aria-label="Next month">›</button>
+        </div>
+      </header>
+      <div class="researcher-calendar__grid">
+        <span *ngFor="let day of ['M','T','W','T','F','S','S']" class="researcher-calendar__cell researcher-calendar__cell--muted">{{ day }}</span>
+        <button 
+          *ngFor="let dateInfo of getCalendarDays(); let i = index" 
+          type="button"
+          class="researcher-calendar__cell"
+          [class.researcher-calendar__cell--other-month]="!dateInfo.isCurrentMonth"
+          [class.researcher-calendar__cell--selected]="dateInfo.isCurrentMonth && isDateSelected(dateInfo.day)"
+          [disabled]="!dateInfo.isCurrentMonth"
+          (click)="dateInfo.isCurrentMonth && selectDate(dateInfo.day)"
+        >
+          {{ dateInfo.day }}
+        </button>
+      </div>
+    </div>
+
+    <div class="researcher-modal__actions">
+      <button 
+        type="button" 
+        class="researcher-modal__button researcher-modal__button--primary"
+        (click)="closeDateModal()"
+      >
+        Apply Filter
+      </button>
+      <button 
+        type="button" 
+        class="researcher-modal__button researcher-modal__button--secondary"
+        (click)="closeDateModal()"
+      >
+        Cancel
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Correct Prediction Modal -->
+<div class="researcher-modal-overlay" *ngIf="correctModalOpen">
+  <div class="researcher-modal">
+    <button type="button" class="researcher-modal__close" aria-label="Close modal" (click)="closeCorrectModal()">
+      &times;
+    </button>
+
+    <h2 class="researcher-modal__title">Correct Prediction</h2>
+    
+    <div class="researcher-modal__content" *ngIf="selectedPrediction">
+      <p><strong>Patient:</strong> {{ selectedPrediction.user_name || 'N/A' }}</p>
+      <p><strong>Predicted Disease:</strong> {{ selectedPrediction.predicted_disease }}</p>
+      
+      <div class="researcher-modal__form-group">
+        <label for="correctedDisease" class="researcher-modal__label">Corrected/Actual Disease:</label>
+        <input
+          id="correctedDisease"
+          type="text"
+          [(ngModel)]="correctedDiseaseInput"
+          class="researcher-modal__input"
+          placeholder="Enter corrected disease name"
+          [disabled]="correcting"
+        />
+      </div>
+
+      <div class="researcher-modal__actions">
+        <button 
+          type="button" 
+          class="researcher-modal__button researcher-modal__button--primary"
+          (click)="saveCorrectedPrediction()"
+          [disabled]="correcting || !correctedDiseaseInput.trim()"
+        >
+          <span *ngIf="!correcting">Save</span>
+          <span *ngIf="correcting">Saving...</span>
+        </button>
+        <button 
+          type="button" 
+          class="researcher-modal__button researcher-modal__button--secondary"
+          (click)="closeCorrectModal()"
+          [disabled]="correcting"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+

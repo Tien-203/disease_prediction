@@ -33,6 +33,11 @@
 }
 
 .doctor-dataset__search {
+  flex: 1;
+  min-width: 200px;
+}
+
+.doctor-dataset__search {
   position: relative;
   display: flex;
   align-items: center;
@@ -157,7 +162,7 @@
   font-weight: 600;
 }
 
-.doctor-dataset__questions {
+.doctor-dataset__symptoms {
   margin: 0;
   padding-left: 18px;
   display: flex;
@@ -165,6 +170,14 @@
   gap: 6px;
   color: #143525;
   font-size: 16px;
+}
+
+.doctor-dataset__empty,
+.doctor-dataset__loading {
+  text-align: center;
+  padding: 48px 24px;
+  color: rgba(16, 45, 36, 0.6);
+  font-size: 18px;
 }
 
 .doctor-modal-overlay {

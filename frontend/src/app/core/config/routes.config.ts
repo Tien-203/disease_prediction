@@ -37,8 +37,7 @@ export const ROUTE_PATHS = {
     HOME: '/data-scientist/dashboard',
     DASHBOARD: '/data-scientist/dashboard',
     PROFILE: '/data-scientist/profile',
-    DATASET: '/data-scientist/dataset',
-    UPDATE: '/data-scientist/update'
+    DATASET: '/data-scientist/dataset'
   },
 
   // Researcher routes
@@ -47,7 +46,7 @@ export const ROUTE_PATHS = {
     DASHBOARD: '/researcher/dashboard',
     PROFILE: '/researcher/profile',
     DATASET: '/researcher/dataset',
-    PATIENT: '/researcher/patient'
+    PATIENTS: '/researcher/patients'
   }
 } as const;
 
@@ -56,37 +55,30 @@ export const ROUTE_PATHS = {
  */
 export const ROLE_NAV_LINKS: Record<string, NavLink[]> = {
   patient: [
-    { label: 'Home', path: ROUTE_PATHS.PATIENT.HOME, exact: true },
     { label: 'Profile', path: ROUTE_PATHS.PATIENT.PROFILE },
     { label: 'History', path: ROUTE_PATHS.PATIENT.HISTORY }
   ],
 
   doctor: [
-    { label: 'Home', path: ROUTE_PATHS.DOCTOR.HOME, exact: true },
     { label: 'Profile', path: ROUTE_PATHS.DOCTOR.PROFILE },
     { label: 'Dataset', path: ROUTE_PATHS.DOCTOR.DATASET },
-    { label: 'Patient', path: ROUTE_PATHS.DOCTOR.PATIENTS }
+    { label: 'Patient Log', path: ROUTE_PATHS.DOCTOR.PATIENTS }
   ],
 
   data_scientist: [
-    { label: 'Home', path: ROUTE_PATHS.DATA_SCIENTIST.HOME, exact: true },
     { label: 'Profile', path: ROUTE_PATHS.DATA_SCIENTIST.PROFILE },
-    { label: 'Dataset', path: ROUTE_PATHS.DATA_SCIENTIST.DATASET },
-    { label: 'Update', path: ROUTE_PATHS.DATA_SCIENTIST.UPDATE }
+    { label: 'Dataset', path: ROUTE_PATHS.DATA_SCIENTIST.DATASET }
   ],
 
   datascientist: [
-    { label: 'Home', path: ROUTE_PATHS.DATA_SCIENTIST.HOME, exact: true },
     { label: 'Profile', path: ROUTE_PATHS.DATA_SCIENTIST.PROFILE },
-    { label: 'Dataset', path: ROUTE_PATHS.DATA_SCIENTIST.DATASET },
-    { label: 'Update', path: ROUTE_PATHS.DATA_SCIENTIST.UPDATE }
+    { label: 'Dataset', path: ROUTE_PATHS.DATA_SCIENTIST.DATASET }
   ],
 
   researcher: [
-    { label: 'Home', path: ROUTE_PATHS.RESEARCHER.HOME, exact: true },
     { label: 'Profile', path: ROUTE_PATHS.RESEARCHER.PROFILE },
     { label: 'Dataset', path: ROUTE_PATHS.RESEARCHER.DATASET },
-    { label: 'Patient', path: ROUTE_PATHS.RESEARCHER.PATIENT }
+    { label: 'Patient Log', path: ROUTE_PATHS.RESEARCHER.PATIENTS }
   ]
 };
 

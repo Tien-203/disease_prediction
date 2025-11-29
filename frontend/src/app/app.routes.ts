@@ -16,6 +16,7 @@ import { DoctorPatientsComponent } from './features/doctor/doctor-patients.compo
 import { ResearcherDashboardComponent } from './features/researcher/researcher-dashboard.component';
 import { ResearcherProfileComponent } from './features/researcher/researcher-profile.component';
 import { ResearcherDatasetComponent } from './features/researcher/researcher-dataset.component';
+import { ResearcherPatientsComponent } from './features/researcher/researcher-patients.component';
 
 /**
  * Application routes
@@ -45,6 +46,11 @@ export const routes: Routes = [
     path: 'researcher/dataset',
     component: ResearcherDatasetComponent,
     title: 'Researcher Dataset - Disease Prediction'
+  },
+  {
+    path: 'researcher/patients',
+    component: ResearcherPatientsComponent,
+    title: 'Patient Log - Disease Prediction'
   },
   {
     path: 'doctor',
@@ -95,11 +101,6 @@ export const routes: Routes = [
     path: 'data-scientist/dataset',
     component: DataScientistDatasetComponent,
     title: 'Dataset - Disease Prediction'
-  },
-  {
-    path: 'data-scientist/update',
-    component: DataScientistDashboardComponent,
-    title: 'Update - Disease Prediction'
   },
   {
     path: 'profile',

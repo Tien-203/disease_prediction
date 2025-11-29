@@ -9,7 +9,8 @@ from app.schemas.prediction import (
     PredictionRequest,
     PredictionResponse,
     AlternativePrediction,
-    PredictionHistoryResponse
+    PredictionHistoryResponse,
+    PatientPredictionResponse
 )
 from app.ml.model_loader import model_loader
 from app.ml.predictor import DiseasePredictor
@@ -132,4 +133,88 @@ class PredictionService:
         if prediction:
             return PredictionHistoryResponse.model_validate(prediction)
         return None
+    
+    def get_all_predictions_with_users(
+        self,
+        skip: int = 0,
+        limit: int = 100
+    ) -> List[PatientPredictionResponse]:
+        """
+        Get all predictions with user information (for doctors)
+        
+        Args:
+            skip: Number of records to skip
+            limit: Maximum number of records to return
+            
+        Returns:
+            List of predictions with user info
+        """
+        from sqlalchemy.orm import joinedload
+        
+        # Use joinedload to eagerly load user relationship
+        predictions = self.db.query(Prediction).options(
+            joinedload(Prediction.user)
+        ).order_by(
+            Prediction.timestamp.desc()
+        ).offset(skip).limit(limit).all()
+        
+        from app.models.disease import Disease
+        
+        result = []
+        for pred in predictions:
+            user = pred.user if pred.user_id else None
+            
+            # Get recommendation from disease table based on predicted_disease or corrected_disease
+            disease_name = pred.corrected_disease if pred.corrected_disease else pred.predicted_disease
+            recommendation = None
+            if disease_name:
+                disease = self.db.query(Disease).filter(
+                    Disease.name.ilike(disease_name.strip())
+                ).first()
+                if disease and disease.recommendations:
+                    recommendation = disease.recommendations
+            
+            result.append(PatientPredictionResponse(
+                id=pred.id,
+                user_id=pred.user_id,
+                user_name=user.name if user else None,
+                user_age=user.age if user else None,
+                user_gender=user.gender if user else None,
+                symptoms=pred.symptoms,
+                predicted_disease=pred.predicted_disease,
+                confidence=pred.confidence,
+                timestamp=pred.timestamp,
+                corrected_disease=pred.corrected_disease,
+                recommendation=recommendation
+            ))
+        
+        return result
+    
+    def update_prediction(
+        self,
+        prediction_id: int,
+        corrected_disease: str
+    ) -> Optional[PredictionHistoryResponse]:
+        """
+        Update prediction with corrected disease
+        
+        Args:
+            prediction_id: Prediction ID
+            corrected_disease: Corrected/actual disease name
+            
+        Returns:
+            Updated prediction record or None
+        """
+        prediction = self.db.query(Prediction).filter(
+            Prediction.id == prediction_id
+        ).first()
+        
+        if not prediction:
+            return None
+        
+        prediction.corrected_disease = corrected_disease
+        self.db.commit()
+        self.db.refresh(prediction)
+        
+        return PredictionHistoryResponse.model_validate(prediction)
 

@@ -87,13 +87,25 @@ def train_disease_prediction_model_with_groups(data_file: str, models_dir: str):
     logger.info(f"Number of unique diseases: {len(label_encoder.classes_)}")
     logger.info(f"Diseases: {label_encoder.classes_[:10]}{'...' if len(label_encoder.classes_) > 10 else ''}")
     
+    # Check if stratification is possible (all classes need at least 2 samples)
+    unique, counts = np.unique(y_encoded, return_counts=True)
+    min_class_count = counts.min()
+    can_stratify = min_class_count >= 2
+    
+    if can_stratify:
+        logger.info(f"Using stratified split (minimum class count: {min_class_count})")
+        stratify_param = y_encoded
+    else:
+        logger.warning(f"Cannot use stratified split (minimum class count: {min_class_count} < 2). Using random split instead.")
+        stratify_param = None
+    
     # Split data
     logger.info("Splitting data into train and test sets...")
     X_train, X_test, y_train, y_test = train_test_split(
         X_encoded, y_encoded,
         test_size=0.2,
         random_state=42,
-        stratify=y_encoded
+        stratify=stratify_param
     )
     
     logger.info(f"Training set size: {X_train.shape[0]}")

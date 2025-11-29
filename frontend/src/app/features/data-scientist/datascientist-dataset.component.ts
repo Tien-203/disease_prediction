@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Subject, takeUntil } from 'rxjs';
+import { Subject, takeUntil, interval } from 'rxjs';
 import { ApiService } from '../../core/services/api.service';
 
 interface DatasetRecord {
@@ -26,13 +26,11 @@ interface ModelPerformance {
     recall_std?: number;
     f1_std?: number;
   };
-  per_disease_performance: Array<{
-    disease: string;
-    accuracy: number;
-    precision: number;
-    recall: number;
-    f1_score?: number;
-  }>;
+}
+
+interface RetrainResponse {
+  message: string;
+  status: string;
 }
 
 /**
@@ -52,6 +50,11 @@ export class DataScientistDatasetComponent implements OnInit, OnDestroy {
   performanceModalOpen = false;
   modelPerformance: ModelPerformance | null = null;
   isLoadingPerformance = false;
+  isRetraining = false;
+  retrainMessage = '';
+  retrainError = '';
+  trainingStatus: 'idle' | 'training' | 'completed' | 'failed' = 'idle';
+  private pollingInterval?: any;
   
   private destroy$ = new Subject<void>();
 
@@ -62,6 +65,7 @@ export class DataScientistDatasetComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.stopPolling();
     this.destroy$.next();
     this.destroy$.complete();
   }
@@ -124,6 +128,98 @@ export class DataScientistDatasetComponent implements OnInit, OnDestroy {
 
   formatPercentage(value: number): string {
     return `${(value * 100).toFixed(1)}%`;
+  }
+
+  retrainModel(): void {
+    if (this.isRetraining) {
+      return;
+    }
+
+    if (!confirm('Are you sure you want to retrain the model? This may take several minutes.')) {
+      return;
+    }
+
+    this.isRetraining = true;
+    this.retrainMessage = '';
+    this.retrainError = '';
+    this.trainingStatus = 'training';
+
+    this.apiService.post<RetrainResponse>('/model/retrain', {})
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response: RetrainResponse) => {
+          this.retrainMessage = response.message;
+          // Start polling for training status
+          this.startPolling();
+        },
+        error: (error: any) => {
+          console.error('Error retraining model:', error);
+          this.retrainError = error?.error?.detail || error?.message || 'Failed to start model retraining. Please try again.';
+          this.isRetraining = false;
+          this.trainingStatus = 'failed';
+        }
+      });
+  }
+
+  startPolling(): void {
+    // Poll every 5 seconds
+    this.pollingInterval = interval(5000)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => {
+        this.checkTrainingStatus();
+      });
+    
+    // Check immediately
+    this.checkTrainingStatus();
+  }
+
+  stopPolling(): void {
+    if (this.pollingInterval) {
+      this.pollingInterval.unsubscribe();
+      this.pollingInterval = undefined;
+    }
+  }
+
+  checkTrainingStatus(): void {
+    this.apiService.get<{
+      is_training: boolean;
+      status: string;
+      message: string;
+      started_at: string | null;
+      completed_at: string | null;
+      error: string | null;
+    }>('/model/training-status')
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (status) => {
+          this.trainingStatus = status.status as 'idle' | 'training' | 'completed' | 'failed';
+          this.retrainMessage = status.message;
+          
+          if (status.status === 'completed') {
+            this.isRetraining = false;
+            this.stopPolling();
+            // Reload performance metrics
+            if (this.performanceModalOpen) {
+              this.loadModelPerformance();
+            }
+            // Reload dataset
+            this.loadDataset();
+          } else if (status.status === 'failed') {
+            this.isRetraining = false;
+            this.retrainError = status.error || 'Model training failed';
+            this.stopPolling();
+          } else if (status.status === 'training') {
+            this.isRetraining = true;
+          } else {
+            this.isRetraining = false;
+            this.stopPolling();
+          }
+        },
+        error: (error: any) => {
+          console.error('Error checking training status:', error);
+          // Continue polling even if there's an error
+        }
+      });
   }
 }
 

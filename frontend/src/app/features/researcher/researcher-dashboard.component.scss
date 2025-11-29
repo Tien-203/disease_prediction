@@ -41,7 +41,7 @@
   color: #486a57;
 }
 
-.res-button {
+.doc-button {
   border: none;
   border-radius: 18px;
   padding: 18px 34px;
@@ -51,7 +51,7 @@
   transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
 }
 
-.res-button--primary {
+.doc-button--primary {
   background-color: #c9ea74;
   color: #102d24;
   box-shadow: 0 16px 26px rgba(201, 234, 116, 0.28);
@@ -62,7 +62,7 @@
   }
 }
 
-.res-button--secondary {
+.doc-button--secondary {
   background-color: #113226;
   color: #f5f9ee;
   box-shadow: 0 14px 28px rgba(17, 50, 38, 0.25);

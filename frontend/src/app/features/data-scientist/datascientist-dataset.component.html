@@ -25,11 +25,32 @@
         
         <button 
           type="button" 
+          class="ds-dataset__retrain-btn"
+          (click)="retrainModel()"
+          [disabled]="isRetraining || trainingStatus === 'training'"
+          title="Retrain model"
+        >
+          <span *ngIf="trainingStatus === 'idle' || trainingStatus === 'completed' || trainingStatus === 'failed'">🔄 Retrain Model</span>
+          <span *ngIf="trainingStatus === 'training'">⏳ Training...</span>
+        </button>
+        
+        <button 
+          type="button" 
           class="ds-dataset__performance-btn"
           (click)="openPerformanceModal()"
         >
           Modal Performance
         </button>
+      </div>
+      
+      <div class="ds-dataset__retrain-message" *ngIf="retrainMessage && trainingStatus !== 'failed'">
+        <p class="ds-dataset__retrain-success" [class.ds-dataset__retrain-info]="trainingStatus === 'training'">
+          {{ retrainMessage }}
+        </p>
+      </div>
+      
+      <div class="ds-dataset__retrain-error" *ngIf="retrainError || trainingStatus === 'failed'">
+        <p class="ds-dataset__retrain-error-text">{{ retrainError || 'Model training failed' }}</p>
       </div>
     </div>
 
@@ -96,12 +117,6 @@
               <td>{{ formatPercentage(modelPerformance.overall_metrics.recall) }}</td>
               <td>{{ formatPercentage(modelPerformance.overall_metrics.f1_score) }}</td>
             </tr>
-            <tr *ngIf="modelPerformance.overall_metrics.accuracy_std">
-              <td>^ {{ modelPerformance.overall_metrics.accuracy_std }}%</td>
-              <td>^ {{ modelPerformance.overall_metrics.precision_std }}%</td>
-              <td>^ {{ modelPerformance.overall_metrics.recall_std }}%</td>
-              <td>^ {{ modelPerformance.overall_metrics.f1_std }}%</td>
-            </tr>
           </tbody>
         </table>
       </div>
@@ -112,24 +127,6 @@
         <p *ngIf="modelPerformance.n_estimators"><strong>N Estimators:</strong> {{ modelPerformance.n_estimators }}</p>
         <p><strong>Features:</strong> {{ modelPerformance.n_features }}</p>
         <p><strong>Classes:</strong> {{ modelPerformance.n_classes }}</p>
-      </div>
-
-      <!-- Per-Disease Performance -->
-      <div class="ds-performance-modal__section">
-        <h3 class="ds-performance-modal__section-title">Per-Disease Performance</h3>
-        <div class="ds-performance-modal__disease-list">
-          <div 
-            class="ds-performance-modal__disease-item"
-            *ngFor="let disease of modelPerformance.per_disease_performance"
-          >
-            <div class="ds-performance-modal__disease-name">{{ disease.disease }}</div>
-            <div class="ds-performance-modal__disease-metrics">
-              <span><strong>Accuracy:</strong> {{ formatPercentage(disease.accuracy) }}</span>
-              <span><strong>Precision:</strong> {{ formatPercentage(disease.precision) }}</span>
-              <span><strong>Recall:</strong> {{ formatPercentage(disease.recall) }}</span>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
 

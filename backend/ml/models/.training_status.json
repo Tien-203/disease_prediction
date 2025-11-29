@@ -1,0 +1,8 @@
+{
+  "is_training": false,
+  "status": "completed",
+  "message": "Model training completed successfully",
+  "started_at": "2025-11-28T15:06:00.845374",
+  "completed_at": "2025-11-28T15:06:03.880468",
+  "error": null
+}

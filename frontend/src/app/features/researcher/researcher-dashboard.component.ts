@@ -30,11 +30,11 @@ export class ResearcherDashboardComponent implements OnInit {
     }
   }
 
-  exportDataset(): void {
-    this.router.navigate(['/researcher/dataset'], { queryParams: { action: 'export' } });
+  goToPatients(): void {
+    this.router.navigate(['/researcher/patients']);
   }
 
-  viewDataset(): void {
+  goToDataset(): void {
     this.router.navigate(['/researcher/dataset']);
   }
 }

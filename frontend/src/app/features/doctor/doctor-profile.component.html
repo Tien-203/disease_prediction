@@ -2,7 +2,15 @@
   <section class="doctor-profile__card">
     <h1 class="doctor-profile__title">Personal Information</h1>
 
-    <form (ngSubmit)="saveProfile()" class="doctor-profile__form" novalidate>
+    <div *ngIf="error" class="doctor-profile__error" role="alert">
+      {{ error }}
+    </div>
+
+    <div *ngIf="success" class="doctor-profile__success" role="alert">
+      {{ success }}
+    </div>
+
+    <form (ngSubmit)="saveProfile()" class="doctor-profile__form" *ngIf="!loading" novalidate>
       <label class="doctor-profile__label" for="name">Doctor Name</label>
       <input
         id="name"
@@ -12,6 +20,7 @@
         [(ngModel)]="name"
         class="doctor-profile__input"
         placeholder="Enter your name"
+        [disabled]="saving"
       />
 
       <label class="doctor-profile__label" for="idNumber">ID Number</label>
@@ -23,14 +32,18 @@
         [(ngModel)]="idNumber"
         class="doctor-profile__input"
         placeholder="Enter your ID"
+        [disabled]="saving"
       />
 
-      <button type="submit" class="doctor-profile__button">
-        Save
+      <button type="submit" class="doctor-profile__button" [disabled]="saving">
+        <span *ngIf="!saving">Save</span>
+        <span *ngIf="saving">Saving...</span>
       </button>
-
-      <p class="doctor-profile__success" *ngIf="showSuccess">Profile updated successfully.</p>
     </form>
+
+    <div *ngIf="loading" class="doctor-profile__loading">
+      <p>Loading profile...</p>
+    </div>
   </section>
 </div>
 

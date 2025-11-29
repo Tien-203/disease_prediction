@@ -12,87 +12,37 @@
         />
       </div>
 
-      <div class="researcher-dataset__date-group">
-        <button type="button" class="res-chip" (click)="openDateModal('from')">
-          <span>From</span>
-          <strong>{{ fromDate }}</strong>
-        </button>
-        <button type="button" class="res-chip" (click)="openDateModal('to')">
-          <span>To</span>
-          <strong>{{ toDate }}</strong>
-        </button>
-      </div>
-
       <button type="button" class="researcher-dataset__export" (click)="exportDataset()">
         Export Dataset
       </button>
     </div>
 
-    <div class="researcher-dataset__list">
+    <div class="researcher-dataset__list" *ngIf="!isLoading">
       <article class="researcher-dataset__item" *ngFor="let record of filteredRecords">
         <div class="researcher-dataset__column">
           <span class="researcher-dataset__label">Date Modified</span>
-          <span class="researcher-dataset__value">{{ record.dateModified }}</span>
+          <span class="researcher-dataset__value">{{ record.date_modified }}</span>
         </div>
         <div class="researcher-dataset__column">
           <span class="researcher-dataset__label">Disease</span>
           <span class="researcher-dataset__value">{{ record.disease }}</span>
         </div>
         <div class="researcher-dataset__column">
-          <span class="researcher-dataset__label">Questions</span>
-          <ul class="researcher-dataset__questions">
-            <li *ngFor="let question of record.questions">{{ question }}</li>
+          <span class="researcher-dataset__label">Symptoms</span>
+          <ul class="researcher-dataset__symptoms">
+            <li *ngFor="let symptom of record.symptoms">{{ symptom }}</li>
           </ul>
         </div>
       </article>
-    </div>
-  </section>
-</div>
-
-<div class="researcher-modal-overlay" *ngIf="dateModalOpen">
-  <div class="researcher-modal">
-    <button type="button" class="researcher-modal__close" aria-label="Close date picker" (click)="closeDateModal()">
-      &times;
-    </button>
-
-    <div class="researcher-modal__chips">
-      <button
-        type="button"
-        class="res-chip"
-        [class.res-chip--active]="activeDatePicker === 'from'"
-        (click)="openDateModal('from')"
-      >
-        <span>From</span>
-        <strong>{{ fromDate }}</strong>
-      </button>
-      <button
-        type="button"
-        class="res-chip"
-        [class.res-chip--active]="activeDatePicker === 'to'"
-        (click)="openDateModal('to')"
-      >
-        <span>To</span>
-        <strong>{{ toDate }}</strong>
-      </button>
-    </div>
-
-    <div class="researcher-calendar">
-      <header class="researcher-calendar__header">
-        <span>October 2021</span>
-        <div class="researcher-calendar__nav">
-          <button type="button">‹</button>
-          <button type="button">›</button>
-        </div>
-      </header>
-      <div class="researcher-calendar__grid">
-        <span *ngFor="let day of ['M','T','W','T','F','S','S']" class="researcher-calendar__cell researcher-calendar__cell--muted">{{ day }}</span>
-        <button *ngFor="let date of [].constructor(31); let i = index" type="button"
-          class="researcher-calendar__cell"
-        >
-          {{ i + 1 }}
-        </button>
+      
+      <div class="researcher-dataset__empty" *ngIf="filteredRecords.length === 0">
+        <p>No records found{{ searchTerm ? ' matching your search' : '' }}.</p>
       </div>
     </div>
-  </div>
+
+    <div class="researcher-dataset__loading" *ngIf="isLoading">
+      <p>Loading dataset...</p>
+    </div>
+  </section>
 </div>
 

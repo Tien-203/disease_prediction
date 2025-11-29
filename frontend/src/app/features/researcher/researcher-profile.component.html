@@ -2,7 +2,15 @@
   <section class="researcher-profile__card">
     <h1 class="researcher-profile__title">Personal Information</h1>
 
-    <form (ngSubmit)="saveProfile()" class="researcher-profile__form" novalidate>
+    <div *ngIf="error" class="researcher-profile__error" role="alert">
+      {{ error }}
+    </div>
+
+    <div *ngIf="success" class="researcher-profile__success" role="alert">
+      {{ success }}
+    </div>
+
+    <form (ngSubmit)="saveProfile()" class="researcher-profile__form" *ngIf="!loading" novalidate>
       <label class="researcher-profile__label" for="name">Researcher Name</label>
       <input
         id="name"
@@ -12,6 +20,7 @@
         [(ngModel)]="name"
         class="researcher-profile__input"
         placeholder="Enter your name"
+        [disabled]="saving"
       />
 
       <label class="researcher-profile__label" for="idNumber">ID Number</label>
@@ -23,14 +32,18 @@
         [(ngModel)]="idNumber"
         class="researcher-profile__input"
         placeholder="Enter your ID"
+        [disabled]="saving"
       />
 
-      <button type="submit" class="researcher-profile__button">
-        Save
+      <button type="submit" class="researcher-profile__button" [disabled]="saving">
+        <span *ngIf="!saving">Save</span>
+        <span *ngIf="saving">Saving...</span>
       </button>
-
-      <p class="researcher-profile__success" *ngIf="showSuccess">Profile updated successfully.</p>
     </form>
+
+    <div *ngIf="loading" class="researcher-profile__loading">
+      <p>Loading profile...</p>
+    </div>
   </section>
 </div>
 

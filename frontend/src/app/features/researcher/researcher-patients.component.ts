@@ -6,16 +6,16 @@ import { PatientPrediction, PredictionUpdateRequest } from '../prediction/models
 import * as XLSX from 'xlsx';
 
 /**
- * Doctor patient records component
+ * Researcher patient records component
  */
 @Component({
-  selector: 'app-doctor-patients',
+  selector: 'app-researcher-patients',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  templateUrl: './doctor-patients.component.html',
-  styleUrls: ['./doctor-patients.component.scss']
+  templateUrl: './researcher-patients.component.html',
+  styleUrls: ['./researcher-patients.component.scss']
 })
-export class DoctorPatientsComponent implements OnInit {
+export class ResearcherPatientsComponent implements OnInit {
   searchTerm = '';
   fromDate: Date | null = null;
   toDate: Date | null = null;

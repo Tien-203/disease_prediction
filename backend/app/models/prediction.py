@@ -18,6 +18,7 @@ class Prediction(Base):
     alternatives = Column(JSONB, nullable=True)  # Alternative predictions as JSON
     timestamp = Column(DateTime(timezone=True), server_default=func.now(), index=True)
     session_id = Column(String(100), nullable=True, index=True)  # For tracking user sessions
+    corrected_disease = Column(String(100), nullable=True)  # Actual disease corrected by doctor
     
     # Relationship to user
     user = relationship("User", back_populates="predictions")

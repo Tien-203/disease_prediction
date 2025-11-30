@@ -8,31 +8,36 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y \
     gcc \
     postgresql-client \
+    curl \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy dependency files
-COPY pyproject.toml ./
-
-# Install Python dependencies
+# Install uv using pip (more reliable in Docker)
 RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir -e .
+    pip install --no-cache-dir uv
 
-# Copy application code
+# Copy dependency files and application code (needed for uv sync to install the project)
+COPY pyproject.toml uv.lock ./
 COPY app/ ./app/
+
+# Install Python dependencies using uv sync
+RUN uv sync --frozen --no-dev
+
+# Copy remaining application files
 COPY ml/ ./ml/
 COPY alembic/ ./alembic/
 COPY alembic.ini ./
 COPY scripts/ ./scripts/
 
-# Make entrypoint script executable
-RUN chmod +x scripts/docker-entrypoint.sh
+
+# Convert line endings (CRLF to LF) and make entrypoint script executable
+RUN sed -i 's/\r$//' scripts/docker-entrypoint.sh && \
+    chmod +x scripts/docker-entrypoint.sh
 
 # Expose port
 EXPOSE 8000
 
 # Use entrypoint script
-ENTRYPOINT ["./scripts/docker-entrypoint.sh"]
+ENTRYPOINT ["/app/scripts/docker-entrypoint.sh"]
 
 # Default command
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
-
+CMD ["uv", "run", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]

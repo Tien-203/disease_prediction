@@ -13,8 +13,6 @@
 */package-lock.json
 /yarn.lock
 
-# Environment files
-/.env
 
 # Angular CLI and build artefacts
 /.angular-cli.json
@@ -111,7 +109,6 @@ celerybeat.pid
 *.sage.py
 
 # Environments
-.env
 .venv
 env_uv
 */env_uv/

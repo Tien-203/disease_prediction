@@ -26,7 +26,7 @@ echo "PostgreSQL is ready!"
 
 # Run migration check script
 echo "Checking database migrations..."
-python scripts/check_migrations.py
+uv run python scripts/check_migrations.py
 
 if [ $? -ne 0 ]; then
   echo "Migration check failed. Exiting."

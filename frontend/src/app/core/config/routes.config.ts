@@ -55,6 +55,7 @@ export const ROUTE_PATHS = {
  */
 export const ROLE_NAV_LINKS: Record<string, NavLink[]> = {
   patient: [
+    { label: 'Home', path: ROUTE_PATHS.PATIENT.HOME },
     { label: 'Profile', path: ROUTE_PATHS.PATIENT.PROFILE },
     { label: 'History', path: ROUTE_PATHS.PATIENT.HISTORY }
   ],
@@ -66,11 +67,13 @@ export const ROLE_NAV_LINKS: Record<string, NavLink[]> = {
   ],
 
   data_scientist: [
+    { label: 'Home', path: ROUTE_PATHS.DATA_SCIENTIST.HOME },
     { label: 'Profile', path: ROUTE_PATHS.DATA_SCIENTIST.PROFILE },
     { label: 'Dataset', path: ROUTE_PATHS.DATA_SCIENTIST.DATASET }
   ],
 
   datascientist: [
+    { label: 'Home', path: ROUTE_PATHS.DATA_SCIENTIST.HOME },
     { label: 'Profile', path: ROUTE_PATHS.DATA_SCIENTIST.PROFILE },
     { label: 'Dataset', path: ROUTE_PATHS.DATA_SCIENTIST.DATASET }
   ],

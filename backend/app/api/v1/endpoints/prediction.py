@@ -72,7 +72,8 @@ def get_prediction_history(
     skip: int = 0,
     limit: int = 100,
     session_id: Optional[str] = None,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User | None = Depends(get_current_user_optional)
 ):
     """
     Get prediction history
@@ -81,13 +82,17 @@ def get_prediction_history(
         skip: Number of records to skip
         limit: Maximum number of records to return
         session_id: Optional session ID filter
+        current_user: Current authenticated user (optional)
     """
     try:
         service = PredictionService(db)
+        # Get user_id if user is authenticated, otherwise None
+        user_id = current_user.id if current_user else None
         predictions = service.get_prediction_history(
             skip=skip,
             limit=limit,
-            session_id=session_id
+            session_id=session_id,
+            user_id=user_id
         )
         
         return PredictionHistoryListResponse(

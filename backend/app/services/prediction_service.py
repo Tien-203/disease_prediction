@@ -89,7 +89,8 @@ class PredictionService:
         self,
         skip: int = 0,
         limit: int = 100,
-        session_id: Optional[str] = None
+        session_id: Optional[str] = None,
+        user_id: Optional[int] = None
     ) -> List[PredictionHistoryResponse]:
         """
         Get prediction history
@@ -98,12 +99,18 @@ class PredictionService:
             skip: Number of records to skip
             limit: Maximum number of records to return
             session_id: Optional session ID filter
+            user_id: Optional user ID filter (filters by current user)
             
         Returns:
             List of prediction history records
         """
         query = self.db.query(Prediction)
         
+        # Filter by user_id if provided (for authenticated users)
+        if user_id is not None:
+            query = query.filter(Prediction.user_id == user_id)
+        
+        # Filter by session_id if provided (for anonymous users)
         if session_id:
             query = query.filter(Prediction.session_id == session_id)
         

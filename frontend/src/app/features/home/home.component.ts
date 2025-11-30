@@ -40,6 +40,7 @@ export class HomeComponent implements OnInit, AfterViewChecked {
   // Describe Symptoms Modal
   showDescribeModal: boolean = false;
   symptomDescription: string = '';
+  isExtractingSymptoms: boolean = false;
 
   constructor(
     private authService: AuthService,
@@ -379,7 +380,7 @@ export class HomeComponent implements OnInit, AfterViewChecked {
   }
 
   /**
-   * Submit description and continue
+   * Submit description and extract symptoms
    */
   submitDescription(): void {
     if (!this.symptomDescription.trim()) {
@@ -387,12 +388,58 @@ export class HomeComponent implements OnInit, AfterViewChecked {
       return;
     }
 
-    // For now, navigate to prediction page with the description
-    // In a real implementation, you might want to process the text
-    // and extract symptoms using NLP or show a symptom selection interface
-    this.closeDescribeModal();
-    this.router.navigate(['/prediction'], { 
-      state: { description: this.symptomDescription } 
+    // Extract symptoms from natural language
+    this.isExtractingSymptoms = true;
+    this.predictionService.extractSymptomsFromDescription(this.symptomDescription).subscribe({
+      next: (response) => {
+        this.isExtractingSymptoms = false;
+        
+        if (response.symptoms && response.symptoms.length > 0) {
+          // Close describe modal
+          this.closeDescribeModal();
+          
+          // Show results modal with loading
+          this.showResultsModal = true;
+          this.isProcessing = true;
+          
+          // Make prediction with extracted symptoms
+          const request: PredictionRequest = {
+            symptoms: response.symptoms,
+            session_id: `describe-${Date.now()}`
+          };
+
+          this.predictionService.predictDisease(request).subscribe({
+            next: (predictionResponse: PredictionResponse) => {
+              this.predictionResult = predictionResponse;
+              
+              // Prepare all predictions (main + alternatives)
+              this.allPredictions = [
+                { disease: predictionResponse.predicted_disease, confidence: predictionResponse.confidence },
+                ...predictionResponse.alternatives.map(alt => ({
+                  disease: alt.disease,
+                  confidence: alt.confidence
+                }))
+              ].sort((a, b) => b.confidence - a.confidence);
+              
+              this.isProcessing = false;
+              this.shouldScrollToTop = true;
+            },
+            error: (error) => {
+              console.error('Error predicting disease:', error);
+              this.isProcessing = false;
+              this.closeResultsModal();
+              alert('Failed to get prediction. Please try again.');
+            }
+          });
+        } else {
+          alert('No symptoms could be extracted from your description. Please try describing your symptoms more clearly.');
+        }
+      },
+      error: (error) => {
+        console.error('Error extracting symptoms:', error);
+        this.isExtractingSymptoms = false;
+        alert('Failed to extract symptoms. Please try again or use the Quick Check feature.');
+      }
     });
   }
 

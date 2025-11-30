@@ -35,6 +35,13 @@ export class PredictionService {
   }
 
   /**
+   * Extract symptoms from natural language description
+   */
+  extractSymptomsFromDescription(description: string): Observable<{ symptoms: string[]; count: number }> {
+    return this.apiService.post<{ symptoms: string[]; count: number }>('/symptoms/extract', { description });
+  }
+
+  /**
    * Predict disease based on symptoms
    */
   predictDisease(request: PredictionRequest): Observable<PredictionResponse> {

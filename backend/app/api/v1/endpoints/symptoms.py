@@ -11,9 +11,12 @@ from app.schemas.symptom import (
     SymptomUpdate,
     SymptomResponse,
     SymptomListResponse,
-    SymptomGroupsResponse
+    SymptomGroupsResponse,
+    SymptomExtractionRequest,
+    SymptomExtractionResponse
 )
 from app.services.symptom_service import SymptomService
+from app.services.symptom_extraction_service import SymptomExtractionService
 
 router = APIRouter()
 
@@ -193,5 +196,40 @@ def delete_symptom(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error deleting symptom: {str(e)}"
+        )
+
+
+@router.post("/extract", response_model=SymptomExtractionResponse)
+def extract_symptoms_from_description(
+    request: SymptomExtractionRequest
+):
+    """
+    Extract predefined symptoms from natural language description
+    
+    Args:
+        request: Natural language description of symptoms
+        
+    Returns:
+        List of extracted predefined symptom names
+    """
+    try:
+        service = SymptomExtractionService()
+        symptoms = service.extract_symptoms(request.description)
+        
+        return SymptomExtractionResponse(
+            symptoms=symptoms,
+            count=len(symptoms)
+        )
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e)
+        )
+    except Exception as e:
+        traceback_str = traceback.format_exc()
+        logger.error(f"Error extracting symptoms: {str(e)}\n{traceback_str}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error extracting symptoms: {str(e)}"
         )
 

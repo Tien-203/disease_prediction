@@ -42,6 +42,12 @@ class Settings(BaseSettings):
     ALGORITHM: str = Field(default="HS256", description="JWT algorithm")
     ACCESS_TOKEN_EXPIRE_MINUTES: int = Field(default=30, description="Access token expiration in minutes")
     
+    # Gemini API
+    GEMINI_API_KEY: str = Field(
+        default="",
+        description="Google Gemini API key for natural language symptom extraction"
+    )
+    
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",

@@ -93,21 +93,28 @@
       <h2 class="modal-title">How are you feeling right now?</h2>
     </div>
 
-    <div class="modal-body">
+    <div class="modal-body" *ngIf="!isExtractingSymptoms">
       <textarea
         class="description-input"
         [(ngModel)]="symptomDescription"
         placeholder="Describe your feeling"
-        rows="6">
+        rows="6"
+        [disabled]="isExtractingSymptoms">
       </textarea>
+    </div>
+
+    <div class="modal-body" *ngIf="isExtractingSymptoms">
+      <div class="loading-container">
+        <p>Analyzing your symptoms...</p>
+      </div>
     </div>
 
     <div class="modal-footer modal-footer--right">
       <button 
         class="modal-button modal-button--primary" 
         (click)="submitDescription()"
-        [disabled]="!symptomDescription.trim()">
-        Continue
+        [disabled]="!symptomDescription.trim() || isExtractingSymptoms">
+        {{ isExtractingSymptoms ? 'Processing...' : 'Continue' }}
       </button>
     </div>
   </div>

@@ -55,3 +55,14 @@ class SymptomGroup(BaseModel):
 class SymptomGroupsResponse(BaseModel):
     """Schema for grouped symptoms response"""
     groups: list[SymptomGroup]
+
+
+class SymptomExtractionRequest(BaseModel):
+    """Schema for symptom extraction from natural language"""
+    description: str = Field(..., min_length=1, description="Natural language description of symptoms")
+
+
+class SymptomExtractionResponse(BaseModel):
+    """Schema for symptom extraction response"""
+    symptoms: list[str] = Field(..., description="List of extracted predefined symptom names")
+    count: int = Field(..., description="Number of symptoms extracted")

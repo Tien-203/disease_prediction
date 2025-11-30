@@ -8,7 +8,7 @@
   "recall": 1.0,
   "f1_score": 1.0,
   "n_features": 13,
-  "n_classes": 42,
+  "n_classes": 41,
   "classes": [
     "(vertigo) Paroymsal  Positional Vertigo",
     "AIDS",
@@ -50,8 +50,7 @@
     "Typhoid",
     "Urinary tract infection",
     "Varicose veins",
-    "hepatitis A",
-    "ti\u1ec3u \u0111\u01b0\u1eddng"
+    "hepatitis A"
   ],
   "feature_names": [
     "pain",
@@ -71,55 +70,55 @@
   "feature_importance": [
     {
       "feature": "other",
-      "importance": 0.1344016404301487
+      "importance": 0.14738466611679354
     },
     {
       "feature": "pain",
-      "importance": 0.12811515628044326
+      "importance": 0.12035336088467115
     },
     {
       "feature": "skin",
-      "importance": 0.11573375865325759
+      "importance": 0.1037811848768026
     },
     {
       "feature": "digestive",
-      "importance": 0.08971577808667072
+      "importance": 0.09925695140473322
     },
     {
       "feature": "neurological",
-      "importance": 0.07658054338898342
+      "importance": 0.07723876012714198
     },
     {
       "feature": "fever",
-      "importance": 0.07527952451986501
+      "importance": 0.0733519284532456
     },
     {
       "feature": "energy",
-      "importance": 0.07146538812051355
+      "importance": 0.072240448497452
     },
     {
       "feature": "respiratory",
-      "importance": 0.06044430504049541
-    },
-    {
-      "feature": "joint_muscle",
-      "importance": 0.058737861388359604
+      "importance": 0.07198673763552703
     },
     {
       "feature": "urinary",
-      "importance": 0.05862383812585638
-    },
-    {
-      "feature": "vision",
-      "importance": 0.05193742151034193
+      "importance": 0.05405820707511087
     },
     {
       "feature": "mental",
-      "importance": 0.0501039663289837
+      "importance": 0.054012761578668265
+    },
+    {
+      "feature": "joint_muscle",
+      "importance": 0.052577126967824996
+    },
+    {
+      "feature": "vision",
+      "importance": 0.04919464801228541
     },
     {
       "feature": "appetite_weight",
-      "importance": 0.028860818126080757
+      "importance": 0.024563218369743414
     }
   ]
 }

@@ -2,6 +2,7 @@
 import traceback
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
+from sqlalchemy import text
 from loguru import logger
 
 from app.api.deps import get_db
@@ -24,7 +25,7 @@ def health_check(db: Session = Depends(get_db)):
     """
     # Check database connection
     try:
-        db.execute("SELECT 1")
+        db.execute(text("SELECT 1"))
         db_status = "connected"
     except Exception as e:
         traceback_str = traceback.format_exc()
@@ -41,4 +42,3 @@ def health_check(db: Session = Depends(get_db)):
         database=db_status,
         ml_model=ml_status
     )
-

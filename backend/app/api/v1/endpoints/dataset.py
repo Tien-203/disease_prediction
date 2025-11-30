@@ -43,8 +43,15 @@ def get_dataset_records(
     """
     try:
         # Path to CSV file
-        backend_dir = Path(__file__).parent.parent.parent.parent.parent
-        csv_path = backend_dir / "ml" / "data" / "processed" / "processed_dataset_with_groups.csv"
+        # Try absolute path first (for Docker where working dir is /app)
+        csv_path = Path("/app/ml/data/processed/processed_dataset_with_groups.csv")
+        
+        # Fallback to relative path calculation if absolute doesn't exist
+        if not csv_path.exists():
+            # __file__ is at backend/app/api/v1/endpoints/dataset.py
+            # Go up 5 levels to get to backend directory
+            backend_dir = Path(__file__).parent.parent.parent.parent.parent
+            csv_path = backend_dir / "ml" / "data" / "processed" / "processed_dataset_with_groups.csv"
         
         if not csv_path.exists():
             logger.warning(f"CSV file not found: {csv_path}")

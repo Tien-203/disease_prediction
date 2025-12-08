@@ -16,6 +16,17 @@ docker-compose up --build -d
 - Backend API: http://localhost:8000
 - API Docs: http://localhost:8000/docs
 
+**Built-in test accounts (password `123456`):**
+- researcher@gmail.com (researcher role)
+- data_scientist@gmail.com (data_scientist role)
+- patient@gmail.com (patient role)
+- doctor@gmail.com (doctor role)
+
+Notes about these accounts:
+- Already seeded in the default database that ships with `docker-compose up`.
+- Intended for quick end-to-end testing of role-based UI/API flows.
+- Update or rotate these passwords before any production use.
+
 ## ML Pipeline: Training the Model
 
 You can view datasets, modify data, and retrain the model directly through the web UI. Alternatively, you can train the model using the command-line scripts below.
